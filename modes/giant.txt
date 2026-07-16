@@ -1,0 +1,54 @@
+12 dice
+Upper section: 9 of each
+Bonus requires minimum 189. Bonus is 200 points
+
+1 pair
+2 pairs
+3 pairs
+4 pairs
+5 pairs
+6 pairs
+
+3 of a kind
+4 of a kind
+5 of a kind
+6 of a kind
+7 of a kind
+8 of a kind
+9 of a kind
+10 of a kind
+11 of a kind
+
+2x3 of the same
+2x4 of the same
+2x5 of the same
+2x6 of the same
+
+3x3 of the same
+3x4 of the same
+
+Lav (1-2-3-4-5): 15 points
+Høj (2-3-4-5-6): 20 points
+Cameron (1-2-3-4-5-6): 30 points
+Lille Claus (1-2-3-4-5-6 + 2x6): 50 points
+Store Claus (1-2-3-4-5-6 + 3x6): 75 points
+Knold (1-2-3-4-5-6 + 4x6): 100 points
+Tot (1-2-3-4-5-6 + 5x6): 150 points
+Kaptajn Vom (1-2-3-4-5-6 + 6x6): 200 points
+
+Lillemor (3+2 of the same)
+Posten (4+2 of the same)
+Momsemor (5+2 of the same)
+Skipperskræk (6+2 of the same)
+Radiserne (4+3 of the same)
+Basserne (5+3 of the same)
+Gyldenspjæt (6+3 of the same)
+Kasket Karl (5+4 of the same)
+Klaus Kludder (6+4 of the same)
+Jens Lyn (6+5 of the same)
+
+Chance
+Yatzy: 250 points
+
+2x3 of the same is 3 unique twice (e.g 3 fives + 3 sixes)
+3+2 of the same is 3 unique + 2 unique (e.g 3 fives + 2 sixes)
