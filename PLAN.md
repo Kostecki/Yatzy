@@ -64,6 +64,7 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 - **Persistence**: SQLite + Drizzle ORM.
 - **Routing**: `svelte-spa-router` (small, well-worn, not worth hand-rolling even for ~4 routes).
 - **Auth model**: none. Session creation returns an opaque `hostToken` stored in the host's `localStorage`, required on host-only mutations via a tRPC middleware. The session code/QR is the only real boundary — same trust model as a shared paper sheet.
+- **DX tooling**: Biome for linting + formatting (single tool, no ESLint/Prettier) — has genuine, if experimental, Svelte support since v2.3/2.4 (formats and lints the HTML/CSS/JS inside `.svelte` files, including template-aware checks), which is currently ahead of oxc's tooling for this framework (oxlint/oxfmt only see `.svelte` script blocks, no template awareness yet) — evaluated both, went with the mature single-tool option. Bundling is Rolldown-powered for free via Vite 8+ (default since March 2026), no separate package needed. Biome needs `css.parser.tailwindDirectives: true` in `biome.json` to recognize Tailwind v4's custom CSS syntax (`@apply`/`@theme`/`@variant`/`@source`) — off by default, otherwise flags it as unrecognized.
 
 ---
 
@@ -139,17 +140,16 @@ Notes:
 
 **Yatzy bonus**: self-contained in the single `yatzy` category/primitive, params `{ flatBonus, includeEyesBonus }`. No cross-turn state — evaluated once, same as any other category. No stacking bonus for multiple Yatzys. `includeEyesBonus` is false for all three built-in modes but stays available per-category for future custom modes.
 
-**Primitive catalog** — nine primitives cover all three built-in modes, none of them mode-exclusive except `straight_plus_extra`:
+**Primitive catalog** — eight primitives cover all three built-in modes, none of them mode-exclusive except `straight_plus_extra`:
 
 - `sum_of_face(face)` — Ones–Sixes, all modes.
-- `n_of_a_kind_sum(n)` — exactly N dice of the best matching face × face value (not "all matching dice," confirmed). Covers Normal/Family's 3/4-of-a-kind and Giant's 3–11-of-a-kind — one primitive, all three modes.
-- `n_pairs(n)` — sum of `n` pairs (exactly `2n` dice, highest available faces). Covers Normal's 1/2 Pair, Family's 1/2/3 Pairs, Giant's 1–6 Pairs.
-- `n_groups_of_size(groups, size)` — sum of `groups × size` dice across that many distinct faces. Covers Family's "2×3 of the same" and Giant's 2×/3× categories.
+- `n_of_a_kind_sum(requiredCount)` — exactly `requiredCount` dice of the best matching face × face value (not "all matching dice," confirmed). Covers Normal/Family's 3/4-of-a-kind and Giant's 3–11-of-a-kind — one primitive, all three modes.
+- `n_groups_of_size(groups, size)` — sum of `groups × size` dice across that many distinct faces, using the highest-value qualifying faces. `size: 2` covers every "pairs" category (Normal's 1/2 Pair, Family's 1/2/3 Pairs, Giant's 1–6 Pairs) — pairs are just this primitive's `size=2` case, not a separate primitive — and other sizes cover Family's "2×3 of the same" and Giant's 2×/3× categories.
 - `two_groups_sizes(sizeA, sizeB)` — sum of `sizeA + sizeB` dice across two distinct faces. Covers Normal/Family's House **and** all ten of Giant's named combos (Lillemor…Jens Lyn) — one primitive instead of treating House as a special case.
-- `straight(low, high, fixedValue)` — fixed value if the roll contains at least one of each face in range, else 0; only needs to check presence, not exact roll length, so it already works whether the mode's dice count exactly matches the range (Normal/Family) or the range is a subset of a much bigger roll (Giant's Lav/Høj/Cameron). Covers every straight in every mode, including Family's Royal and Giant's Cameron (both 1-6).
-- `straight_plus_extra(straightLow, straightHigh, extraFace, extraCount, fixedValue)` — the one Giant-only primitive: Lille Claus / Store Claus / Knold / Tot / Kaptajn Vom.
+- `straight(low, high, fixedScore)` — fixed score if the roll contains at least one of each face in range, else 0; only needs to check presence, not exact roll length, so it already works whether the mode's dice count exactly matches the range (Normal/Family) or the range is a subset of a much bigger roll (Giant's Lav/Høj/Cameron). Covers every straight in every mode, including Family's Royal and Giant's Cameron (both 1-6).
+- `straight_plus_extra(straightLow, straightHigh, extraFace, extraCount, fixedScore)` — the one Giant-only primitive: Lille Claus / Store Claus / Knold / Tot / Kaptajn Vom.
 - `chance()` — sum of all dice, dice-count-agnostic, all modes.
-- `yatzy({ flatBonus, includeEyesBonus })` — flat bonus if all dice match; `n` (dice required) is inferred from `mode.diceCount`, so the same primitive handles Normal's 5-of-a-kind, Family's 6-of-a-kind, and Giant's 12-of-a-kind Yatzy.
+- `yatzy(dice, { flatBonus, includeEyesBonus, requiredCount })` — flat bonus if some face's count === `requiredCount`; `requiredCount` is passed explicitly from `mode.diceCount` rather than inferred from `dice.length`, since the dice-input UI may hand primitives a trimmed, category-relevant array rather than the full physical roll (see "Dice-input UI design" open item) — `dice.length` can't be trusted to equal the mode's dice count.
 
 **Default labels**: each primitive is paired with an optional default-label generator (`params → string`), e.g. `two_groups_sizes` defaults to `"{sizeA}+{sizeB} of a Kind"`, `straight` defaults to `"Straight {low}-{high}"`. A category row's stored `label` is an override — if left unset, the UI falls back to the primitive's generated default from that row's `params`. This means most categories (especially future custom-mode ones) never need a hand-written label at all, and the flavorful/named ones (House, Lillemor, Lav, Yatzy, etc.) just set `label` explicitly on their own row.
 
@@ -226,7 +226,7 @@ Backlog (post-v1): end-of-game celebration screen + podium/standings.
 
 ## Open items (small, non-blocking)
 
-- Dice-input UI design (how a roll gets entered before scoring a category).
+- Dice-input UI design (how a roll gets entered before scoring a category) — resolved principle: input should be **category-aware**, not a universal "tap all N dice" grid. Since dice values are never persisted (only the computed `scores.value` is stored), the UI only needs to collect enough to drive the selected category's specific primitive (e.g. a "which face, how many" picker for n-of-a-kind/pairs/group categories, a straight checklist, a single face picker for Yatzy) rather than requiring every one of the 12 dice to be entered individually for Giant. Exact widget design per primitive shape still TBD.
 - Session short-code generation scheme (e.g. word-pair like "BEAR-217" vs random) and QR generation library.
 - Cross-out display symbol (plain `0`, a dash, or something else).
 - Tooltip copy (description + example dice) for every category across all three modes — the scoring rules and point values are now fully settled (source: `5-dice.txt`, `6-dice.txt`, `giant.txt`), just the explanatory text/examples are left to write during seeding.
