@@ -202,8 +202,11 @@ package
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,node,svelte
 
-# Sqlite
+# SQLite
 *.sqlite
 *.sqlite-journal
+
+# Claude Code local settings
+.claude/settings.local.json
 
 thoughts.txt
