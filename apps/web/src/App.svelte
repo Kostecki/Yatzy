@@ -1,8 +1,8 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+  import heroImg from "./assets/hero.png";
+  import svelteLogo from "./assets/svelte.svg";
+  import viteLogo from "./assets/vite.svg";
+  import Counter from "./lib/Counter.svelte";
 </script>
 
 <section id="center">
@@ -37,7 +37,7 @@
       <li>
         <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
           <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
+          Learn more about Svelte
         </a>
       </li>
     </ul>
