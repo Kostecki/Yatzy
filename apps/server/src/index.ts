@@ -1,4 +1,6 @@
+import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import Fastify from "fastify";
+import { appRouter } from "./routers/index.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -6,6 +8,10 @@ const fastify = Fastify({
 	logger: true,
 });
 
+await fastify.register(fastifyTRPCPlugin, {
+	prefix: "/trpc",
+	trpcOptions: { router: appRouter },
+});
 await fastify.register(import("@fastify/websocket"));
 
 // Declare a route

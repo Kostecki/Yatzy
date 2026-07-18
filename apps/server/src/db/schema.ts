@@ -58,7 +58,7 @@ export const gameModeCategories = sqliteTable(
 );
 
 export const sessions = sqliteTable("sessions", {
-	code: text("code").primaryKey(),
+	sessionCode: text("code").primaryKey(),
 	gameModeId: text("game_mode_id")
 		.references(() => gameModes.id, { onDelete: "cascade" })
 		.notNull(),
@@ -71,7 +71,7 @@ export const sessionCategories = sqliteTable(
 	"session_categories",
 	{
 		sessionCode: text("session_code")
-			.references(() => sessions.code, { onDelete: "cascade" })
+			.references(() => sessions.sessionCode, { onDelete: "cascade" })
 			.notNull(),
 		categoryId: text("category_id")
 			.references(() => categories.id, { onDelete: "cascade" })
@@ -89,7 +89,7 @@ export const players = sqliteTable("players", {
 		.primaryKey()
 		.$defaultFn(() => crypto.randomUUID()),
 	sessionCode: text("session_code")
-		.references(() => sessions.code, { onDelete: "cascade" })
+		.references(() => sessions.sessionCode, { onDelete: "cascade" })
 		.notNull(),
 	name: text("name").notNull(),
 	orderIndex: integer("order_index").notNull(),
@@ -99,7 +99,7 @@ export const scores = sqliteTable(
 	"scores",
 	{
 		sessionCode: text("session_code")
-			.references(() => sessions.code, { onDelete: "cascade" })
+			.references(() => sessions.sessionCode, { onDelete: "cascade" })
 			.notNull(),
 		playerId: text("player_id")
 			.references(() => players.id, { onDelete: "cascade" })
