@@ -11,7 +11,7 @@ Self-hosted (Docker, no ongoing SaaS), used mainly on iPads (host) and iPhones (
 - Score a category by selecting it and entering the final dice roll — no manual summing.
 - Companion page: each player can check their own progress on their phone instead of asking the host.
 - Totals hidden by default (no peeking at the running score), host can reveal.
-- Multiple game modes (dice count + category set), with default modes plus the ability to add/remove categories.
+- Multiple game modes (dice count + category set): Normal, Family, Giant. When starting a game, categories can be added/removed from the chosen mode as a one-off tweak for that game only — this is not a "save as a new mode" feature, there's no persistent custom-mode management. Next game, you're back to picking from the three defaults.
 - Click a category (in-game or while picking a mode) to see what roll it needs.
 - No accounts anywhere. Host creates a game and enters players; companions join via a short URL/QR and pick themselves from that list.
 
@@ -28,9 +28,9 @@ Sourced directly from `5-dice.txt` / `6-dice.txt` / `giant.txt`. Most categories
   Ones–Sixes · 1/2/3 Pairs · 3 of a Kind · 4 of a Kind · 2×3 of the same (two distinct-face triples) · House (2+3) · Lille (fixed 15) · Stor (fixed 20) · Royal (1-6 straight, fixed 30) · Chance · Yatzy (fixed 50)
 
 - **Giant** — 12 dice. Upper bonus: minimum 189, bonus 200 (9 of each).
-  Ones–Sixes · 1–6 Pairs · 3–11 of a Kind · 2×3/2×4/2×5/2×6 of the same · 3×3/3×4 of the same · Lav (1-5 straight, fixed 15) · Høj (2-6 straight, fixed 20) · Cameron (1-6 straight, fixed 30) · Lille Claus (straight+2×6, fixed 50) · Store Claus (straight+3×6, fixed 75) · Knold (straight+4×6, fixed 100) · Tot (straight+5×6, fixed 150) · Kaptajn Vom (straight+6×6, fixed 200) · Lillemor (3+2) · Posten (4+2) · Momsemor (5+2) · Skipperskræk (6+2) · Radiserne (4+3) · Basserne (5+3) · Gyldenspjæt (6+3) · Kasket Karl (5+4) · Klaus Kludder (6+4) · Jens Lyn (6+5) · Chance · Yatzy (fixed 250)
+  Ones–Sixes · 1–6 Pairs · 3–11 of a Kind · 2×3/2×4/2×5/2×6 of the same · 3×3/3×4 of the same · Lav (1-5 straight, fixed 15) · Høj (2-6 straight, fixed 20) · Cameron (1-6 straight, fixed 30) · Lille Claus (straight+2×6, fixed 50) · Store Claus (straight+3×6, fixed 75) · Knold (straight+4×6, fixed 100) · Tot (straight+5×6, fixed 150) · Kaptajn Vom (straight+6×6, fixed 200) · Lillemor (3+2) · Poeten (4+2) · Momsemor (5+2) · Skipperskræk (6+2) · Radiserne (4+3) · Basserne (5+3) · Gyldenspjæt (6+3) · Kasket Karl (5+4) · Klaus Kludder (6+4) · Jens Lyn (6+5) · Chance · Yatzy (fixed 250 + eyes bonus)
 
-None of the three modes currently use the Yatzy eyes-bonus variant (all flat: 50/50/250) — it's kept in the design as a per-mode toggle for future custom modes, not deleted. See "Scoring engine" below.
+Normal's Yatzy is flat-only (50, no eyes bonus). Family (50) and Giant (250) both include the eyes-bonus variant — confirmed from the source files, corrects an earlier assumption that none of the built-in modes used it. The toggle stays per-mode/per-category either way, so this was just a data correction, not a design change. See "Scoring engine" below.
 
 Architecture supports adding a new mode (like Giant was) as close to a **data-only change** as possible: mapping Giant onto Normal/Family's primitives left exactly one genuinely new primitive needed (`straight_plus_extra`, for the Claus/Knold/Tot family) — everything else reused.
 
@@ -38,7 +38,8 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 
 ## Product/UX decisions
 
-- **Companion flow**: scan QR/open short link → pick your name from the host-entered player list → live-updating, read-only view of your own progress. No claiming/locking a player identity — if two phones pick the same player, that's fine, matches how a physical sheet already has everything visible on one page.
+- **Companion flow**: scan QR/open short link → pick your name from the host-entered player list → live-updating, read-only view of your own progress. No claiming/locking a player identity — if two phones pick the same player, that's fine, matches how a physical sheet already has everything visible on one page. Companion view is scoped to that one player only — never shows other players' scores, and never shows any total/sum, ever. There is no "reveal" concept on companion at all.
+- **What "hide totals" actually means**: individually entered category scores are always visible to whoever's allowed to see that row (yourself on companion, every player on host) — that's just tracking progress, never hidden. Totals/sums are simply never shown on companion, full stop — no flag, no reveal event, nothing to sync. On the host screen, seeing totals early is a plain local UI toggle (off by default, unsynced, resets on refresh, no DB column — pure personal convenience for the one device running the host view). The actual "reveal" moment — final standings/podium — happens once on the host screen when the game finishes (`sessions.finishedAt` set), not as a separate flag. Server always sends full data (including totals) to every client; hiding is purely a client-side rendering choice, never response filtering.
 - **Late joiners**: explicitly out of scope for v1. The data model doesn't fight this if it comes up anyway (a player added mid-game just starts with a blank card), but no UX is being designed around it.
 - **Typo fixes**: host can rename a player after the fact.
 - **Cross-out / "no score"**: part of the normal per-category entry flow (not a separate button elsewhere), writes a real `0`. No separate flag is needed to distinguish "chose to cross out" from "rolled and it scored zero" — every zero is rule-legitimate (every category except Chance can naturally compute to 0; Chance's minimum is `diceCount × 1`, never zero). Display symbol for a zero (plain `0`, a dash, something else) is still TBD, decide during UI work.
@@ -51,6 +52,7 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 - **Bonus progress indicator**: running subtotal of the deltas filled in so far, shown near the upper section, so pace-to-bonus is visible at a glance.
 - **Yatzy bonus**: flat bonus, per mode (Normal 50, Family 50, Giant 250), with an optional "extra points equal to eyes rolled" variant (`includeEyesBonus`) kept available per-mode for future custom modes even though none of the three built-in modes currently use it. No stacking bonus for multiple Yatzys in one game.
 - **Backlog (not building now)**: a fun end-of-game screen — animation/fireworks, a podium for the top finishers plus a list of the rest. Needs no new backend or schema, just a results view sorted by final score plus a frontend animation library (e.g. `canvas-confetti`) whenever it gets built.
+- **Backlog (not building now)**: a game history / stats view. Sessions are meant to persist rather than be cleaned up, so this needs no schema changes when it happens — `sessions.finishedAt` (null while in progress) already gives both the "is this game done" filter and the sort order a history list needs.
 
 ---
 
@@ -86,23 +88,30 @@ export const categories = sqliteTable('categories', {
   description: text('description').notNull(), // tooltip copy
   section: text('section', { enum: ['upper', 'lower'] }).notNull(),
   primitive: text('primitive').notNull(),       // key into the code-side scoring catalog
-  params: text('params', { mode: 'json' }),     // e.g. { face: 1 } or { n: 3 } or { flatBonus, includeEyesBonus }
-  exampleDice: text('example_dice', { mode: 'json' }), // number[]
+  params: text('params', { mode: 'json' }).notNull(),     // e.g. {} for chance, { face: 1 }, { n: 3 }, { flatBonus, includeEyesBonus }
+  exampleDice: text('example_dice', { mode: 'json' }), // number[]; null = no static example, tooltip computes one dynamically (currently only sum_of_face categories)
 });
 
 export const gameModeCategories = sqliteTable('game_mode_categories', {
   gameModeId: text('game_mode_id').notNull().references(() => gameModes.id),
   categoryId: text('category_id').notNull().references(() => categories.id),
   orderIndex: integer('order_index').notNull(),
+  labelOverride: text('label_override'), // null = use categories.label (or its own fallback); set when the same category needs a different display name for this mode (e.g. House vs. Lillemor)
 }, (t) => ({ pk: primaryKey({ columns: [t.gameModeId, t.categoryId] }) }));
+
+export const sessionCategories = sqliteTable('session_categories', {
+  sessionCode: text('session_code').notNull().references(() => sessions.code),
+  categoryId: text('category_id').notNull().references(() => categories.id),
+  orderIndex: integer('order_index').notNull(),
+  labelOverride: text('label_override'), // copied from game_mode_categories.labelOverride at session creation, same reasoning as everything else in this table being a locked-in resolved copy
+}, (t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.categoryId] }) }));
 
 export const sessions = sqliteTable('sessions', {
   code: text('code').primaryKey(),              // short human code
   gameModeId: text('game_mode_id').notNull().references(() => gameModes.id),
   hostTokenHash: text('host_token_hash').notNull(),
-  hideTotals: integer('hide_totals', { mode: 'boolean' }).notNull().default(true),
-  totalsRevealed: integer('totals_revealed', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  finishedAt: integer('finished_at', { mode: 'timestamp' }),  // null = in progress, set = finished (also the history sort key)
 });
 
 export const players = sqliteTable('players', {
@@ -126,7 +135,8 @@ Notes:
 - Composite primary keys on join-ish tables avoid meaningless surrogate ids.
 - `hostTokenHash` stored hashed so a DB backup doesn't hand out live edit access to an open game.
 - `upperBonusThreshold` / `upperBonusAmount` live on `game_modes` so each mode configures its own bonus rule (Normal: 63/50; Family: 84/50; Giant: 189/200).
-- **Category rows are not deduplicated by primitive+params, and sharing a row across modes is optional, never required.** Two categories can use the identical primitive and params but be different rows with different labels — e.g. `house` (Normal/Family) and `lillemor` (Giant) both run `two_groups_sizes({sizeA:3, sizeB:2})` but are separate rows, same pattern as `lille` (Normal) vs. `lav` (Giant) both being `straight(1,5,15)`. A row is only shared across modes' `game_mode_categories` when it's genuinely identical in every displayed aspect (e.g. plain "Ones" could be one row referenced by all three modes) — that's a convenience, not a rule.
+- **Category rows are not deduplicated by primitive+params, and sharing a row across modes is optional, never required — but when only the *name* differs, use `gameModeCategories.labelOverride` instead of a separate row.** `house` (Normal/Family) and Giant's "Lillemor" are the same `two_groups_sizes({sizeA:3, sizeB:2})`, same description, same everything except what it's called — that's one category row, referenced by both, with Giant's `game_mode_categories` link setting `labelOverride: "Lillemor"`. Same for `lille`/"Lav", `stor`/"Høj", `royal`/"Cameron". Separate rows are still the right call when something *other* than the name differs (different `params`, different `description`, etc.) — the override only covers "identical in every way except display name."
+- **`sessionCategories` vs. `gameModeCategories`**: `gameModeCategories` is just the default template per built-in mode, used to pre-populate the picker when starting a new game. `sessionCategories` is the resolved, locked-in category list for one specific session — copied from the mode's defaults at creation time, with any per-session add/remove tweaks already applied. This is what actually drives the scorecard, not `gameModeCategories`. See "Per-session category tweaks" below for why this exists as its own table instead of being derived on the fly.
 
 ---
 
@@ -153,6 +163,10 @@ Notes:
 
 **Default labels**: each primitive is paired with an optional default-label generator (`params → string`), e.g. `two_groups_sizes` defaults to `"{sizeA}+{sizeB} of a Kind"`, `straight` defaults to `"Straight {low}-{high}"`. A category row's stored `label` is an override — if left unset, the UI falls back to the primitive's generated default from that row's `params`. This means most categories (especially future custom-mode ones) never need a hand-written label at all, and the flavorful/named ones (House, Lillemor, Lav, Yatzy, etc.) just set `label` explicitly on their own row.
 
+**`exampleDice` stores only the meaningful/matching dice, no filler** — e.g. `[6,6,6]` for "Three of a Kind," not padded out to any particular dice count. The tooltip UI pads it out to whichever mode's actual dice count it's currently being shown for (5/6/12), using arbitrary non-matching filler, at render time. This is what keeps a category row shareable across modes despite different dice counts — the visual always matches the mode you're looking at without needing separate stored rows per mode. One primitive is the exception: `yatzy` needs every die to match, so its padding rule is "repeat the matching value," not "add arbitrary filler." This applies to every primitive **except** `sum_of_face` — see below.
+
+**Upper section (`sum_of_face`) is a special case, both for the text hint and the visual example.** Unlike the other primitives, its "required count" isn't in the category's own `params` at all — it comes from the *mode's* bonus threshold (`requiredCount = mode.upperBonusThreshold / 21`: 3 for Normal, 4 for Family, 9 for Giant), the same number the delta-display cells already compute. Because that number is mode-dependent and only knowable at render time, the tooltip doesn't use a stored `exampleDice` for these categories at all — it synthesizes the *entire* example live from `(mode, category.params.face)`: `requiredCount` dice showing `params.face`, padded with filler to `mode.diceCount`. Ones–Sixes store `exampleDice: null` for exactly this reason — there's nothing meaningful to store, so the column honestly reflects that instead of holding a placeholder value nothing reads. The tooltip also needs mode context for this to work even outside an active game, since it's shown during mode selection too, before any session/delta-display exists to fall back on.
+
 ---
 
 ## tRPC router shape
@@ -167,7 +181,7 @@ Notes:
 - `onUpdate({ code })` → **subscription**, emits full session state on every change
 - `submitScore({ code, hostToken, playerId, categoryId, value })` → mutation, host-only
 - `addPlayer` / `removePlayer` / `renamePlayer` → mutation, host-only
-- `updateSettings({ code, hostToken, hideTotals?, totalsRevealed? })` → mutation, host-only
+- `endGame({ code, hostToken })` → mutation, host-only, stamps `sessions.finishedAt`. Exact trigger conditions (auto-detected when every category/player combo has a score vs. an explicit host action to stop early) still TBD, but the procedure and column are the same regardless — just deciding what calls it and when.
 
 Host-only procedures go through a `hostProcedure` middleware that checks the supplied `hostToken` against the session row and throws `UNAUTHORIZED` on mismatch. `onUpdate` needs no token — readable by anyone with the code.
 
@@ -210,17 +224,16 @@ Routes: `/` (create game), `/s/:code/host` (host control, gated by matching `hos
 
 0. Repo setup: `git init`, pnpm workspace (`pnpm-workspace.yaml` pointing at `apps/*`), `apps/web` and `apps/server` package.json + tsconfig each, root `.gitignore`.
 1. Scoring primitives + full unit test suite (Vitest) — pure functions, no DB/server yet.
-2. SQLite schema (Drizzle) + seed script for Normal/Family game modes and categories.
+2. SQLite schema (Drizzle) + seed script for **all three built-in modes** (Normal, Family, and Giant — done together rather than deferring Giant, since the full category/primitive mapping was already worked out during planning). Confirmed no new primitives were needed beyond `straight_plus_extra`, matching the original extensibility goal.
 3. Fastify + tRPC server: routers, WS hub, wired to SQLite.
 4. Svelte SPA prototype: create game, add players, pick mode, enter dice → auto-score, live via subscription from day one.
 5. Companion view (session code/QR join, pick player, read-only).
 6. Hide/reveal totals toggle.
 7. Category info tooltips (from DB `description`/`example_dice`).
-8. Custom mode builder UI (writes `game_modes`/`game_mode_categories` directly, no redeploy) — bring in TanStack Form here.
+8. Per-session category tweak UI at game creation (add/remove categories from the chosen mode, one-off, writes the resolved list to `sessionCategories` — not a saved mode) — bring in TanStack Form here.
 9. PWA manifest/service worker polish + Dockerfile + docker-compose for self-hosting.
-10. Giant mode: data seed (+ any genuinely new primitives it needs) — validates the extensibility goal.
 
-Backlog (post-v1): end-of-game celebration screen + podium/standings.
+Backlog (post-v1): end-of-game celebration screen + podium/standings; game history / stats view (see Product/UX decisions — needs no schema changes when it happens).
 
 ---
 
