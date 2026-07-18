@@ -37,7 +37,7 @@ Tot (1-2-3-4-5-6 + 5x6): 150 points
 Kaptajn Vom (1-2-3-4-5-6 + 6x6): 200 points
 
 Lillemor (3+2 of the same)
-Posten (4+2 of the same)
+Poeten (4+2 of the same)
 Momsemor (5+2 of the same)
 Skipperskræk (6+2 of the same)
 Radiserne (4+3 of the same)
@@ -48,7 +48,7 @@ Klaus Kludder (6+4 of the same)
 Jens Lyn (6+5 of the same)
 
 Chance
-Yatzy: 250 points
+Yatzy: 250 points (+ eye bonus)
 
 2x3 of the same is 3 unique twice (e.g 3 fives + 3 sixes)
 3+2 of the same is 3 unique + 2 unique (e.g 3 fives + 2 sixes)
