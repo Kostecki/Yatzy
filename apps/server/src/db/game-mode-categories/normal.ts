@@ -1,0 +1,17 @@
+export const normalGameModeCategories = [
+	{ categoryId: "ones", orderIndex: 0 },
+	{ categoryId: "twos", orderIndex: 1 },
+	{ categoryId: "threes", orderIndex: 2 },
+	{ categoryId: "fours", orderIndex: 3 },
+	{ categoryId: "fives", orderIndex: 4 },
+	{ categoryId: "sixes", orderIndex: 5 },
+	{ categoryId: "one_pair", orderIndex: 6 },
+	{ categoryId: "two_pairs", orderIndex: 7 },
+	{ categoryId: "three_of_a_kind", orderIndex: 8 },
+	{ categoryId: "four_of_a_kind", orderIndex: 9 },
+	{ categoryId: "low_straight", orderIndex: 10 },
+	{ categoryId: "high_straight", orderIndex: 11 },
+	{ categoryId: "house", orderIndex: 12 },
+	{ categoryId: "chance", orderIndex: 13 },
+	{ categoryId: "yatzy_5", orderIndex: 14 },
+];
