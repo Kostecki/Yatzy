@@ -1,5 +1,6 @@
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import Fastify from "fastify";
+
 import { appRouter } from "./routers/index.js";
 
 const PORT = Number(process.env.PORT) || 3000;
