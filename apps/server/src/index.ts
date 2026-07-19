@@ -1,10 +1,16 @@
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import Fastify from "fastify";
 
+import { client } from "./db/db-client.js";
 import { appRouter } from "./routers/index.js";
 
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT) || 3000;
+
+// Run database migrations and seed the database with initial data
+migrate(client, { migrationsFolder: "./src/db/drizzle" });
+await import("./db/seed.js");
 
 const fastify = Fastify({
 	logger: true,
