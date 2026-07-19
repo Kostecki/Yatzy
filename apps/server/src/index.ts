@@ -10,11 +10,19 @@ const fastify = Fastify({
 	logger: true,
 });
 
+await fastify.register(import("@fastify/websocket"));
 await fastify.register(fastifyTRPCPlugin, {
 	prefix: "/trpc",
-	trpcOptions: { router: appRouter },
+	trpcOptions: {
+		router: appRouter,
+		keepAlive: {
+			enabled: true,
+			pingMs: 30000,
+			pongWaitMs: 5000,
+		},
+	},
+	useWSS: true,
 });
-await fastify.register(import("@fastify/websocket"));
 
 fastify.get("/", (_request, reply) => {
 	reply.send({ hello: "world" });

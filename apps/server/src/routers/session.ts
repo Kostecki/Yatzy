@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { on } from "node:events";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -13,6 +14,7 @@ import {
 	sessions,
 } from "../db/schema.js";
 import { publicProcedure, router } from "../trpc.js";
+import { broadcastSessionUpdate, sessionEvents } from "../ws-hub.js";
 
 // Generate a random session code of the specified length using the defined alphabet
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -26,8 +28,65 @@ function generateSessionCode(length = 6): string {
 	return code;
 }
 
+// Hash the provided token using SHA-256 and return the hexadecimal representation
 function hashToken(token: string): string {
 	return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+// Retrieve the full state of a session, including its details, players, categories, and scores
+function getFullSessionState(sessionCode: string) {
+	const session = client
+		.select({
+			sessionCode: sessions.sessionCode,
+			gameModeId: sessions.gameModeId,
+			createdAt: sessions.createdAt,
+			finishedAt: sessions.finishedAt,
+		})
+		.from(sessions)
+		.where(eq(sessions.sessionCode, sessionCode))
+		.get();
+
+	if (!session) {
+		return undefined;
+	}
+
+	const sessionPlayers = client
+		.select()
+		.from(players)
+		.where(eq(players.sessionCode, sessionCode))
+		.orderBy(players.orderIndex)
+		.all();
+
+	const sessionCategoryList = client
+		.select({
+			id: categories.id,
+			label: categories.label,
+			labelOverride: sessionCategories.labelOverride,
+			description: categories.description,
+			primitive: categories.primitive,
+			params: categories.params,
+			exampleDice: categories.exampleDice,
+			section: categories.section,
+			orderIndex: sessionCategories.orderIndex,
+		})
+		.from(sessionCategories)
+		.innerJoin(categories, eq(sessionCategories.categoryId, categories.id))
+		.where(eq(sessionCategories.sessionCode, sessionCode))
+		.orderBy(sessionCategories.orderIndex)
+		.all();
+
+	const sessionScores = client
+		.select()
+		.from(scores)
+		.where(eq(scores.sessionCode, sessionCode))
+		.all();
+
+	return {
+		session,
+		players: sessionPlayers,
+		categories: sessionCategoryList,
+		scores: sessionScores,
+	};
 }
 
 // Define a middleware to check if the provided host token is valid for the given session code
@@ -104,67 +163,28 @@ export const sessionRouter = router({
 	get: publicProcedure
 		.input(z.object({ sessionCode: z.string() }))
 		.query(async ({ input: { sessionCode } }) => {
-			const session = client
-				.select({
-					sessionCode: sessions.sessionCode,
-					gameModeId: sessions.gameModeId,
-					createdAt: sessions.createdAt,
-					finishedAt: sessions.finishedAt,
-				})
-				.from(sessions)
-				.where(eq(sessions.sessionCode, sessionCode))
-				.get();
-
-			if (!session) {
+			const state = getFullSessionState(sessionCode);
+			if (!state) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Session not found",
 				});
 			}
 
-			const sessionPlayers = client
-				.select()
-				.from(players)
-				.where(eq(players.sessionCode, sessionCode))
-				.orderBy(players.orderIndex)
-				.all();
-
-			const sessionCategoryList = client
-				.select({
-					id: categories.id,
-					label: categories.label,
-					labelOverride: sessionCategories.labelOverride,
-					description: categories.description,
-					primitive: categories.primitive,
-					params: categories.params,
-					exampleDice: categories.exampleDice,
-					section: categories.section,
-					orderIndex: sessionCategories.orderIndex,
-				})
-				.from(sessionCategories)
-				.innerJoin(categories, eq(sessionCategories.categoryId, categories.id))
-				.where(eq(sessionCategories.sessionCode, sessionCode))
-				.orderBy(sessionCategories.orderIndex)
-				.all();
-
-			const sessionScores = client
-				.select()
-				.from(scores)
-				.where(eq(scores.sessionCode, sessionCode))
-				.all();
-
-			return {
-				session,
-				players: sessionPlayers,
-				categories: sessionCategoryList,
-				scores: sessionScores,
-			};
+			return state;
 		}),
 
-	// TODO: Implement
-	// onUpdate: publicProcedure.subscription(async ({ input }) => {
-	// 	// Implement your session update subscription logic here
-	// }),
+	onUpdate: publicProcedure
+		.input(z.object({ sessionCode: z.string() }))
+		.subscription(async function* ({ input: { sessionCode }, signal }) {
+			yield getFullSessionState(sessionCode);
+
+			for await (const _ of on(sessionEvents, `update:${sessionCode}`, {
+				signal,
+			})) {
+				yield getFullSessionState(sessionCode);
+			}
+		}),
 
 	submitScore: hostProcedure
 		.input(
@@ -190,6 +210,8 @@ export const sessionRouter = router({
 						set: { value, updatedAt: new Date() },
 					})
 					.run();
+
+				broadcastSessionUpdate(sessionCode);
 			},
 		),
 
@@ -206,6 +228,8 @@ export const sessionRouter = router({
 				.insert(players)
 				.values({ sessionCode, name, orderIndex: existingPlayers.length })
 				.run();
+
+			broadcastSessionUpdate(sessionCode);
 		}),
 
 	renamePlayer: hostProcedure
@@ -218,6 +242,8 @@ export const sessionRouter = router({
 					and(eq(players.id, playerId), eq(players.sessionCode, sessionCode)),
 				)
 				.run();
+
+			broadcastSessionUpdate(sessionCode);
 		}),
 
 	removePlayer: hostProcedure
@@ -229,6 +255,8 @@ export const sessionRouter = router({
 					and(eq(players.id, playerId), eq(players.sessionCode, sessionCode)),
 				)
 				.run();
+
+			broadcastSessionUpdate(sessionCode);
 		}),
 
 	endGame: hostProcedure.mutation(async ({ input: { sessionCode } }) => {
@@ -237,5 +265,7 @@ export const sessionRouter = router({
 			.set({ finishedAt: new Date() })
 			.where(eq(sessions.sessionCode, sessionCode))
 			.run();
+
+		broadcastSessionUpdate(sessionCode);
 	}),
 });
