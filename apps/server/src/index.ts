@@ -3,6 +3,7 @@ import Fastify from "fastify";
 
 import { appRouter } from "./routers/index.js";
 
+const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT) || 3000;
 
 const fastify = Fastify({
@@ -15,17 +16,13 @@ await fastify.register(fastifyTRPCPlugin, {
 });
 await fastify.register(import("@fastify/websocket"));
 
-// Declare a route
 fastify.get("/", (_request, reply) => {
 	reply.send({ hello: "world" });
 });
 
-// Run the server!
-fastify.listen({ host: "0.0.0.0", port: PORT }, (err) => {
+fastify.listen({ host: HOST, port: PORT }, (err) => {
 	if (err) {
 		fastify.log.error(err);
 		process.exit(1);
 	}
-
-	// Server is now listening on ${address}
 });
