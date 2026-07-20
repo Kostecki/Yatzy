@@ -13,11 +13,12 @@ import {
 	sessionCategories,
 	sessions,
 } from "../db/schema.js";
+import { primitives } from "../scoring/primitives.js";
 import { publicProcedure, router } from "../trpc.js";
 import { broadcastSessionUpdate, sessionEvents } from "../ws-hub.js";
 
-// Generate a random session code of the specified length using the defined alphabet
-const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+// Generate a random session code of the specified length using the defined character set
+const CODE_ALPHABET = "0123456789";
 function generateSessionCode(length = 6): string {
 	let code = "";
 
@@ -26,6 +27,28 @@ function generateSessionCode(length = 6): string {
 	}
 
 	return code;
+}
+
+function generateUniqueSessionCode(): string {
+	const maxAttempts = 20;
+
+	for (let attempt = 0; attempt < maxAttempts; attempt++) {
+		const code = generateSessionCode();
+		const existing = client
+			.select({ sessionCode: sessions.sessionCode })
+			.from(sessions)
+			.where(eq(sessions.sessionCode, code))
+			.get();
+
+		if (!existing) {
+			return code;
+		}
+	}
+
+	throw new TRPCError({
+		code: "INTERNAL_SERVER_ERROR",
+		message: "Could not generate a unique session code",
+	});
 }
 
 // Hash the provided token using SHA-256 and return the hexadecimal representation
@@ -115,7 +138,7 @@ export const sessionRouter = router({
 			z.object({ gameModeId: z.string(), playerNames: z.array(z.string()) }),
 		)
 		.mutation(async ({ input: { gameModeId, playerNames } }) => {
-			const sessionCode = generateSessionCode();
+			const sessionCode = generateUniqueSessionCode();
 			const hostToken = crypto.randomUUID();
 			const hostTokenHash = hashToken(hostToken);
 
@@ -137,11 +160,7 @@ export const sessionRouter = router({
 
 				playerNames.forEach((name, index) => {
 					tx.insert(players)
-						.values({
-							sessionCode,
-							name,
-							orderIndex: index,
-						})
+						.values({ sessionCode, name, orderIndex: index })
 						.run();
 				});
 
@@ -184,6 +203,35 @@ export const sessionRouter = router({
 			})) {
 				yield getFullSessionState(sessionCode);
 			}
+		}),
+
+	previewScores: publicProcedure
+		.input(
+			z.object({
+				sessionCode: z.string(),
+				diceCounts: z.array(z.number()).length(6),
+			}),
+		)
+		.query(async ({ input: { sessionCode, diceCounts } }) => {
+			const dice = diceCounts.flatMap((count, index) =>
+				Array(count).fill(index + 1),
+			);
+
+			const sessionCategoryList = client
+				.select({
+					id: categories.id,
+					primitive: categories.primitive,
+					params: categories.params,
+				})
+				.from(sessionCategories)
+				.innerJoin(categories, eq(sessionCategories.categoryId, categories.id))
+				.where(eq(sessionCategories.sessionCode, sessionCode))
+				.all();
+
+			return sessionCategoryList.map((category) => ({
+				categoryId: category.id,
+				value: primitives[category.primitive](dice, category.params as never),
+			}));
 		}),
 
 	submitScore: hostProcedure
