@@ -6,7 +6,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "ones",
 		label: "Enere",
-		description: "Sum of all dice showing a 1.",
+		description: "Sum of all dice showing a 1",
 		primitive: "sum_of_face",
 		params: { face: 1 },
 		exampleDice: null,
@@ -15,7 +15,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "twos",
 		label: "Toere",
-		description: "Sum of all dice showing a 2.",
+		description: "Sum of all dice showing a 2",
 		primitive: "sum_of_face",
 		params: { face: 2 },
 		exampleDice: null,
@@ -24,7 +24,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "threes",
 		label: "Treere",
-		description: "Sum of all dice showing a 3.",
+		description: "Sum of all dice showing a 3",
 		primitive: "sum_of_face",
 		params: { face: 3 },
 		exampleDice: null,
@@ -33,7 +33,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "fours",
 		label: "Firere",
-		description: "Sum of all dice showing a 4.",
+		description: "Sum of all dice showing a 4",
 		primitive: "sum_of_face",
 		params: { face: 4 },
 		exampleDice: null,
@@ -42,7 +42,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "fives",
 		label: "Femmere",
-		description: "Sum of all dice showing a 5.",
+		description: "Sum of all dice showing a 5",
 		primitive: "sum_of_face",
 		params: { face: 5 },
 		exampleDice: null,
@@ -51,7 +51,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "sixes",
 		label: "Seksere",
-		description: "Sum of all dice showing a 6.",
+		description: "Sum of all dice showing a 6",
 		primitive: "sum_of_face",
 		params: { face: 6 },
 		exampleDice: null,
@@ -59,8 +59,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "one_pair",
-		label: "Et Par",
-		description: "Two dice showing the same face.",
+		label: "1 Par",
+		description: "Two dice showing the same face",
 		primitive: "n_groups_of_size",
 		params: { groups: 1, size: 2 },
 		exampleDice: [1, 1],
@@ -68,8 +68,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "two_pairs",
-		label: "To Par",
-		description: "Two different pairs of dice showing the same face.",
+		label: "2 Par",
+		description: "Two different pairs of dice showing the same face",
 		primitive: "n_groups_of_size",
 		params: { groups: 2, size: 2 },
 		exampleDice: [1, 1, 2, 2],
@@ -77,8 +77,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "three_pairs",
-		label: "Tre Par",
-		description: "Three different pairs of dice showing the same face.",
+		label: "3 Par",
+		description: "Three different pairs of dice showing the same face",
 		primitive: "n_groups_of_size",
 		params: { groups: 3, size: 2 },
 		exampleDice: [1, 1, 2, 2, 3, 3],
@@ -86,8 +86,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "four_pairs",
-		label: "Fire Par",
-		description: "Four different pairs of dice showing the same face.",
+		label: "4 Par",
+		description: "Four different pairs of dice showing the same face",
 		primitive: "n_groups_of_size",
 		params: { groups: 4, size: 2 },
 		exampleDice: [1, 1, 2, 2, 3, 3, 4, 4],
@@ -95,8 +95,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "five_pairs",
-		label: "Fem Par",
-		description: "Five different pairs of dice showing the same face.",
+		label: "5 Par",
+		description: "Five different pairs of dice showing the same face",
 		primitive: "n_groups_of_size",
 		params: { groups: 5, size: 2 },
 		exampleDice: [1, 1, 2, 2, 3, 3, 4, 4, 5, 5],
@@ -104,8 +104,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "six_pairs",
-		label: "Seks Par",
-		description: "Six different pairs of dice showing the same face.",
+		label: "6 Par",
+		description: "Six different pairs of dice showing the same face",
 		primitive: "n_groups_of_size",
 		params: { groups: 6, size: 2 },
 		exampleDice: [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6],
@@ -114,7 +114,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "three_of_a_kind",
 		label: "3 Ens",
-		description: "Three dice showing the same face.",
+		description: "Three dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 3 },
 		exampleDice: [6, 6, 6],
@@ -123,7 +123,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "four_of_a_kind",
 		label: "4 Ens",
-		description: "Four dice showing the same face.",
+		description: "Four dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 4 },
 		exampleDice: [6, 6, 6, 6],
@@ -132,7 +132,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "five_of_a_kind",
 		label: "5 Ens",
-		description: "Five dice showing the same face.",
+		description: "Five dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 5 },
 		exampleDice: [6, 6, 6, 6, 6],
@@ -141,7 +141,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "six_of_a_kind",
 		label: "6 Ens",
-		description: "Six dice showing the same face.",
+		description: "Six dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 6 },
 		exampleDice: [6, 6, 6, 6, 6, 6],
@@ -150,7 +150,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "seven_of_a_kind",
 		label: "7 Ens",
-		description: "Seven dice showing the same face.",
+		description: "Seven dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 7 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 6],
@@ -159,7 +159,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "eight_of_a_kind",
 		label: "8 Ens",
-		description: "Eight dice showing the same face.",
+		description: "Eight dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 8 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 6, 6],
@@ -168,7 +168,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "nine_of_a_kind",
 		label: "9 Ens",
-		description: "Nine dice showing the same face.",
+		description: "Nine dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 9 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 6, 6, 6],
@@ -177,7 +177,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "ten_of_a_kind",
 		label: "10 Ens",
-		description: "Ten dice showing the same face.",
+		description: "Ten dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 10 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
@@ -186,7 +186,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "eleven_of_a_kind",
 		label: "11 Ens",
-		description: "Eleven dice showing the same face.",
+		description: "Eleven dice showing the same face",
 		primitive: "n_of_a_kind_sum",
 		params: { requiredCount: 11 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
@@ -196,7 +196,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 		id: "two_by_three",
 		label: "2x3 Ens",
 		description:
-			"Two separate groups of three dice, each showing a different face.",
+			"Two separate groups of three dice, each showing a different face",
 		primitive: "n_groups_of_size",
 		params: { groups: 2, size: 3 },
 		exampleDice: [5, 5, 5, 6, 6, 6],
@@ -206,7 +206,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 		id: "two_by_four",
 		label: "2x4 Ens",
 		description:
-			"Two separate groups of four dice, each showing a different face.",
+			"Two separate groups of four dice, each showing a different face",
 		primitive: "n_groups_of_size",
 		params: { groups: 2, size: 4 },
 		exampleDice: [5, 5, 5, 5, 6, 6, 6, 6],
@@ -216,7 +216,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 		id: "two_by_five",
 		label: "2x5 Ens",
 		description:
-			"Two separate groups of five dice, each showing a different face.",
+			"Two separate groups of five dice, each showing a different face",
 		primitive: "n_groups_of_size",
 		params: { groups: 2, size: 5 },
 		exampleDice: [5, 5, 5, 5, 5, 6, 6, 6, 6, 6],
@@ -226,7 +226,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 		id: "two_by_six",
 		label: "2x6 Ens",
 		description:
-			"Two separate groups of six dice, each showing a different face.",
+			"Two separate groups of six dice, each showing a different face",
 		primitive: "n_groups_of_size",
 		params: { groups: 2, size: 6 },
 		exampleDice: [5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6],
@@ -236,7 +236,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 		id: "three_by_three",
 		label: "3x3 Ens",
 		description:
-			"Three separate groups of three dice, each showing a different face.",
+			"Three separate groups of three dice, each showing a different face",
 		primitive: "n_groups_of_size",
 		params: { groups: 3, size: 3 },
 		exampleDice: [4, 4, 4, 5, 5, 5, 6, 6, 6],
@@ -246,7 +246,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 		id: "three_by_four",
 		label: "3x4 Ens",
 		description:
-			"Three separate groups of four dice, each showing a different face.",
+			"Three separate groups of four dice, each showing a different face",
 		primitive: "n_groups_of_size",
 		params: { groups: 3, size: 4 },
 		exampleDice: [4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6],
@@ -255,7 +255,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "low_straight",
 		label: "Lille Straight",
-		description: "A sequence of 1-2-3-4-5.",
+		description: "A sequence of 1-2-3-4-5",
 		primitive: "straight",
 		params: { straightLow: 1, straightHigh: 5, fixedScore: 15 },
 		exampleDice: [1, 2, 3, 4, 5],
@@ -264,7 +264,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "high_straight",
 		label: "Stor Straight",
-		description: "A sequence of 2-3-4-5-6.",
+		description: "A sequence of 2-3-4-5-6",
 		primitive: "straight",
 		params: { straightLow: 2, straightHigh: 6, fixedScore: 20 },
 		exampleDice: [2, 3, 4, 5, 6],
@@ -273,7 +273,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "royal_straight",
 		label: "Royal Straight",
-		description: "A sequence of 1-2-3-4-5-6.",
+		description: "A sequence of 1-2-3-4-5-6",
 		primitive: "straight",
 		params: { straightLow: 1, straightHigh: 6, fixedScore: 30 },
 		exampleDice: [1, 2, 3, 4, 5, 6],
@@ -357,7 +357,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "house", // Also known as "Lillemor" in Gigant-Yatzy
 		label: "Hus",
-		description: "Three of a kind and a pair.",
+		description: "Three of a kind and a pair",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 3, sizeB: 2 },
 		exampleDice: [6, 6, 6, 5, 5],
@@ -366,7 +366,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "poeten",
 		label: "Poeten",
-		description: "Four of a kind and a pair.",
+		description: "Four of a kind and a pair",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 4, sizeB: 2 },
 		exampleDice: [6, 6, 6, 6, 5, 5],
@@ -375,7 +375,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "momsemor",
 		label: "Momsemor",
-		description: "Five of a kind and a pair.",
+		description: "Five of a kind and a pair",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 5, sizeB: 2 },
 		exampleDice: [6, 6, 6, 6, 6, 5, 5],
@@ -384,7 +384,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "skipperskraek",
 		label: "Skipperskræk",
-		description: "Six of a kind and a pair.",
+		description: "Six of a kind and a pair",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 6, sizeB: 2 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 5, 5],
@@ -393,7 +393,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "radiserne",
 		label: "Radiserne",
-		description: "Four of a kind and three of a kind.",
+		description: "Four of a kind and three of a kind",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 4, sizeB: 3 },
 		exampleDice: [6, 6, 6, 6, 5, 5, 5],
@@ -402,7 +402,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "basserne",
 		label: "Basserne",
-		description: "Five of a kind and three of a kind.",
+		description: "Five of a kind and three of a kind",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 5, sizeB: 3 },
 		exampleDice: [6, 6, 6, 6, 6, 5, 5, 5],
@@ -411,7 +411,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "gyldenspjaet",
 		label: "Gyldenspjæt",
-		description: "Six of a kind and three of a kind.",
+		description: "Six of a kind and three of a kind",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 6, sizeB: 3 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 5, 5, 5],
@@ -420,7 +420,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "kasket_karl",
 		label: "Kasket Karl",
-		description: "Five of a kind and four of a kind.",
+		description: "Five of a kind and four of a kind",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 5, sizeB: 4 },
 		exampleDice: [6, 6, 6, 6, 6, 5, 5, 5, 5],
@@ -429,7 +429,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "klaus_kludder",
 		label: "Klaus Kludder",
-		description: "Six of a kind and four of a kind.",
+		description: "Six of a kind and four of a kind",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 6, sizeB: 4 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 5, 5, 5, 5],
@@ -438,7 +438,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "jens_lyn",
 		label: "Jens Lyn",
-		description: "Six of a kind and five of a kind.",
+		description: "Six of a kind and five of a kind",
 		primitive: "two_groups_sizes",
 		params: { sizeA: 6, sizeB: 5 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5],
@@ -447,7 +447,7 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	{
 		id: "chance",
 		label: "Chance",
-		description: "Sum of all dice.",
+		description: "Sum of all dice",
 		primitive: "chance",
 		params: {},
 		exampleDice: null,
@@ -455,8 +455,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "yatzy_5",
-		label: "Yatzy (5)",
-		description: "All 5 dice showing the same face.",
+		label: "Yatzy",
+		description: "All 5 dice showing the same face",
 		primitive: "yatzy",
 		params: { flatBonus: 50, includeEyesBonus: false, requiredCount: 5 },
 		exampleDice: [6, 6, 6, 6, 6],
@@ -464,8 +464,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "yatzy_6",
-		label: "Yatzy (6)",
-		description: "All 6 dice showing the same face.",
+		label: "Yatzy",
+		description: "All 6 dice showing the same face",
 		primitive: "yatzy",
 		params: { flatBonus: 50, includeEyesBonus: true, requiredCount: 6 },
 		exampleDice: [6, 6, 6, 6, 6, 6],
@@ -473,8 +473,8 @@ export const categoriesData: InferInsertModel<typeof categories>[] = [
 	},
 	{
 		id: "yatzy_12",
-		label: "Yatzy (12)",
-		description: "All 12 dice showing the same face.",
+		label: "Yatzy",
+		description: "All 12 dice showing the same face",
 		primitive: "yatzy",
 		params: { flatBonus: 250, includeEyesBonus: true, requiredCount: 12 },
 		exampleDice: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],

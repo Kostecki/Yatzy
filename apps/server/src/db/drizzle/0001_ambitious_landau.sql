@@ -1,0 +1,1 @@
+ALTER TABLE `game_modes` ADD `description` text NOT NULL;

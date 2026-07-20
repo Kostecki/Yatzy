@@ -9,6 +9,7 @@ import {
 export const gameModes = sqliteTable("game_modes", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
+	description: text("description").notNull(),
 	diceCount: integer("dice_count").notNull(),
 	isBuiltin: integer("is_builtin", { mode: "boolean" })
 		.notNull()
