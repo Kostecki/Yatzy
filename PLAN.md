@@ -62,6 +62,7 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 - **Frontend**: Vite + Svelte SPA (not SvelteKit — no SSR/content need), installable PWA via `vite-plugin-pwa`.
 - **Styling**: Tailwind CSS + **shadcn-svelte** (components copied into the repo via CLI, built on headless Bits UI — chosen for the most polished default look, at the cost of a bit more setup than an npm-installed component library).
 - **Client data/state**: TanStack **Query** (cache fed by both request/response calls and WS subscription pushes), TanStack **Table** (the categories × players scorecard grid, since the category list is dynamic per mode), TanStack **Devtools**. Considered and deliberately skipped: Form (defer until the custom mode builder needs it), Store (Svelte's built-in stores already cover this), Virtual (no list in this app is ever long enough to need it), DB (solves distributed/local-first sync problems this app doesn't have).
+- **tRPC ↔ Query wiring**: plain `@trpc/client` (`createTRPCClient`), called manually inside Query's `queryFn`/`mutationFn`, query keys written by hand — not a community Svelte-Query-tRPC adapter. Confirmed at implementation time there's no first-party integration for `@tanstack/svelte-query` (unlike React), only a handful of competing community packages with explicitly incomplete feature parity. More boilerplate per call, but both halves are independently, officially maintained, and it's one fewer new/unstable thing to debug while still learning Svelte.
 - **API/sync**: Fastify + **tRPC** — typed procedures for queries/mutations, typed **subscriptions over WebSocket** for realtime session state (replaces a hand-rolled WS message protocol). Realtime design: an in-memory per-session-code pub/sub hub in the single Node process; mutations write to SQLite then broadcast the full session state to that code's subscribers (state is small, so no diffing — just re-send the whole blob). Implementation-wise, this is a single Node `EventEmitter` (not the `observable()` helper — that's tRPC v10-era; current tRPC v11 subscriptions are async generators, `for await`-ing Node's `events.on(emitter, eventName, { signal })` async iterator, re-yielding the full state on each event).
 - **Persistence**: SQLite + Drizzle ORM.
 - **Routing**: `svelte-spa-router` (small, well-worn, not worth hand-rolling even for ~4 routes).
@@ -230,10 +231,10 @@ Routes: `/` (create game), `/s/:code/host` (host control, gated by matching `hos
 5. Companion view (session code/QR join, pick player, read-only).
 6. Hide/reveal totals toggle.
 7. Category info tooltips (from DB `description`/`example_dice`).
-8. Per-session category tweak UI at game creation (add/remove categories from the chosen mode, one-off, writes the resolved list to `sessionCategories` — not a saved mode) — bring in TanStack Form here.
+8. **Deferred (post-v1)** — Per-session category tweak UI at game creation (add/remove categories from the chosen mode, one-off, writes the resolved list to `sessionCategories` — not a saved mode) — bring in TanStack Form here when it's picked back up.
 9. PWA manifest/service worker polish + Dockerfile + docker-compose for self-hosting.
 
-Backlog (post-v1): end-of-game celebration screen + podium/standings; game history / stats view (see Product/UX decisions — needs no schema changes when it happens).
+Backlog (post-v1): per-session category tweaks (step 8 above); end-of-game celebration screen + podium/standings; game history / stats view (see Product/UX decisions — needs no schema changes when it happens).
 
 ---
 
