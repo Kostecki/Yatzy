@@ -1,13 +1,20 @@
 import path from "node:path";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-// https://vite.dev/config/
 export default defineConfig({
-	plugins: [svelte()],
+	plugins: [react()],
 	resolve: {
 		alias: {
 			$lib: path.resolve("./src/lib"),
+		},
+	},
+	server: {
+		proxy: {
+			"/trpc": {
+				target: "http://localhost:3000",
+				ws: true,
+			},
 		},
 	},
 });
