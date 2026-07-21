@@ -1,0 +1,14 @@
+services:
+  yatzy:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_PATH: /data/yatzy.sqlite
+    volumes:
+      - yatzy-data:/data
+
+volumes:
+  yatzy-data: {}
