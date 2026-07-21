@@ -66,7 +66,7 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 
 ## Architecture
 
-- **Hosting**: 100% self-hosted, single Docker image, one container, one volume for the SQLite file. No external/paid services. Served at `yatzy.mydomain.tld` behind an existing reverse proxy (TLS termination handled there — satisfies the PWA service worker's secure-context requirement for free). **Not yet built** — no `Dockerfile`/`docker-compose.yml` in the repo yet; see Build order step 9.
+- **Hosting**: 100% self-hosted, single Docker image, one container, one named volume for the SQLite file. No external/paid services. Served at `yatzy.mydomain.tld` behind an existing reverse proxy (TLS termination handled there — satisfies the PWA service worker's secure-context requirement for free). **Built** — multi-stage `Dockerfile` (deps → build → prod-deps → runtime, `node:26-alpine`, runs as the non-root `node` user), `docker-compose.yml`, and a GitHub Actions workflow (`build-push-image.yml`) that tests, builds multi-arch (amd64/arm64) images, pushes to `ghcr.io`, and deploys via Komodo on push to `main`. See README for local dev/deploy instructions.
 - **Frontend**: Vite + **React** SPA (not SvelteKit — no SSR/content need). Originally planned as Svelte; the implementation switched to React partway through — everything below reflects the actual React stack, not the original Svelte plan. Installable PWA via `vite-plugin-pwa` — **built**.
 - **Styling**: **Mantine** (`@mantine/core` + `@mantine/hooks`) — component library, not the originally-planned Tailwind + shadcn-svelte (that combination doesn't apply once the frontend is React).
 - **Localization**: `react-i18next`, English + Danish locale files (`common` + `content` namespaces, the latter for game-mode/category copy sourced from the seed data). Not present in the original plan; added during the React build.
@@ -237,8 +237,9 @@ Host-only procedures go through a `hostProcedure` middleware that checks the sup
         primitives.test.ts
       ws-hub.ts        per-session pub/sub, used by the onUpdate subscription
       index.ts          Fastify bootstrap: tRPC plugin, static file serving for /apps/web build output
-Dockerfile          not yet created
-docker-compose.yml  not yet created
+Dockerfile          multi-stage build (deps/build/prod-deps/runtime), runs as non-root "node" user
+docker-compose.yml  single service + named volume for the SQLite file
+.github/workflows/  build-push-image.yml — test, build multi-arch image, push to ghcr.io, deploy via Komodo
 pnpm-workspace.yaml
 ```
 
@@ -257,7 +258,7 @@ Routes: `/` (create game, plus "continue" and history lists), `/s/:code/game` (h
 6. ✅ Hide/reveal totals toggle.
 7. ✅ Category info tooltips (from DB `description`/`example_dice`).
 8. ⏸️ **Deferred, not a current priority** — Per-session category tweak UI at game creation (add/remove categories from the chosen mode, one-off, writes the resolved list to `sessionCategories` — not a saved mode).
-9. ◐ **Partially done** — PWA manifest/service worker: ✅ done (`vite-plugin-pwa`, iOS home-screen meta tags, manifest icon path fix). Dockerfile + docker-compose for self-hosting: **not started**.
+9. ✅ PWA manifest/service worker (`vite-plugin-pwa`, iOS home-screen meta tags, manifest icon path fix). Dockerfile + docker-compose + CI build/push/deploy for self-hosting.
 
 Also built, beyond the original build order:
 - ✅ Multi-device host access (`host_tokens` table, `claimHost`) and "continue where you left off" / game history on the create-game screen.
@@ -266,6 +267,7 @@ Also built, beyond the original build order:
 - ✅ Category-aware dice entry guards (per-face cap + max-distinct-faces cap) so the entry UI can't produce a combination that's provably unscoreable for the selected category.
 - ✅ Off-turn entry warning (non-blocking) in the host's scoring modal.
 - ✅ Localization (English/Danish).
+- ✅ Docker self-hosting: multi-stage `Dockerfile`, `docker-compose.yml`, and a GitHub Actions workflow that tests, builds multi-arch (amd64/arm64) images to `ghcr.io`, and deploys via Komodo over Tailscale on push to `main`.
 
 ---
 
