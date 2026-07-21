@@ -17,60 +17,71 @@ declare module "i18next" {
 export interface CommonMessages {
 	shared: {
 		appTitle: string;
-		sessionCode: string;
 		roundStatus: string;
+		sessionCode: string;
 	};
 	createGame: {
-		heading: string;
-		subheading: string;
+		addPlayer: string;
+		continueAsHost: string;
+		continueAsPlayer: string;
+		continueHeading: string;
+		continueSubheading: string;
+		dragToReorder: string;
 		gameModeLabel: string;
 		gameModePlaceholder: string;
-		playersLabel: string;
-		dragToReorder: string;
-		playerNamePlaceholder: string;
-		removePlayer: string;
-		addPlayer: string;
-		submit: string;
+		heading: string;
+		historyHeading: string;
+		historySubheading: string;
+		joinCodePlaceholder: string;
 		joinHeading: string;
 		joinSubheading: string;
-		joinCodePlaceholder: string;
 		joinSubmit: string;
+		playerCount_one: string;
+		playerCount_other: string;
+		playerNamePlaceholder: string;
+		playersLabel: string;
+		removePlayer: string;
+		subheading: string;
+		submit: string;
 	};
 	host: {
-		missingHostAccess: string;
-		turn: string;
-		gameFinished: string;
-		finishGame: string;
-		invitePlayers: string;
-		extraEyesBonus: string;
-		strike: string;
-		score: string;
-		reset: string;
-		gotIt: string;
-		submit: string;
 		addPlayerPlaceholder: string;
 		addPlayerSubmit: string;
+		extraEyesBonus: string;
+		finishGame: string;
+		gameFinished: string;
+		gotIt: string;
+		missingHostAccess: string;
+		offTurnWarning: string;
+		reset: string;
+		score: string;
+		strike: string;
+		submit: string;
+		turn: string;
 	};
 	playerView: {
-		yourTurn: string;
+		becomeHost: string;
+		becomeHostConfirm: string;
+		becomeHostSubmit: string;
 		waitingFor: string;
+		yourTurn: string;
 	};
 	view: {
 		whoAreYou: string;
 	};
 	scoreTable: {
-		category: string;
-		sum: string;
 		bonus: string;
-		total: string;
-		showTotals: string;
+		category: string;
 		hideTotals: string;
-		save: string;
 		remove: string;
+		save: string;
+		showTotals: string;
+		sum: string;
+		total: string;
 	};
 	inviteQr: {
-		showQr: string;
 		instructions: string;
+		showQr: string;
 	};
 }
 

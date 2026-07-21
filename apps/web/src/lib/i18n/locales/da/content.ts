@@ -178,15 +178,15 @@ export const content: ContentMessages = {
 	gameModes: {
 		normal: {
 			name: "Yatzy",
-			description: "Det klassiske spil - spillet med 5 terninger",
+			description: "Det klassiske spil - med 5 terninger",
 		}, // "The classic game, played with 5 dice"
 		family: {
 			name: "Familie-yatzy",
-			description: "En større variant - spillet med 6 terninger",
+			description: "En større variant - med 6 terninger",
 		}, // "A bigger variant played with 6 dice"
 		giant: {
 			name: "Gigant-yatzy",
-			description: "Den største variant - spillet med 12 terninger",
+			description: "Den største variant - med 12 terninger",
 		}, // "The largest variant, played with 12 dice"
 	},
 };
