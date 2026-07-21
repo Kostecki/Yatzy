@@ -10,10 +10,12 @@ Self-hosted (Docker, no ongoing SaaS), used mainly on iPads (host) and iPhones (
 
 - Score a category by selecting it and entering the final dice roll — no manual summing.
 - Companion page: each player can check their own progress on their phone instead of asking the host.
-- Totals hidden by default (no peeking at the running score), host can reveal.
-- Multiple game modes (dice count + category set): Normal, Family, Giant. When starting a game, categories can be added/removed from the chosen mode as a one-off tweak for that game only — this is not a "save as a new mode" feature, there's no persistent custom-mode management. Next game, you're back to picking from the three defaults.
+- Totals hidden by default (no peeking at the running score), host can reveal. Always revealed once the game is finished.
+- Multiple game modes (dice count + category set): Normal, Family, Giant. When starting a game, categories can be added/removed from the chosen mode as a one-off tweak for that game only — this is not a "save as a new mode" feature, there's no persistent custom-mode management. Next game, you're back to picking from the three defaults. **Deferred, not built** — see Build order.
 - Click a category (in-game or while picking a mode) to see what roll it needs.
 - No accounts anywhere. Host creates a game and enters players; companions join via a short URL/QR and pick themselves from that list.
+- A companion can claim host duties on their own device (e.g. the original host's iPad dies mid-game) without losing the original host's access — see "Multi-device host access" below.
+- Localized UI (English + Danish), switchable at runtime.
 
 ## Game modes
 
@@ -30,7 +32,7 @@ Sourced directly from `5-dice.txt` / `6-dice.txt` / `giant.txt`. Most categories
 - **Giant** — 12 dice. Upper bonus: minimum 189, bonus 200 (9 of each).
   Ones–Sixes · 1–6 Pairs · 3–11 of a Kind · 2×3/2×4/2×5/2×6 of the same · 3×3/3×4 of the same · Lav (1-5 straight, fixed 15) · Høj (2-6 straight, fixed 20) · Cameron (1-6 straight, fixed 30) · Lille Claus (straight+2×6, fixed 50) · Store Claus (straight+3×6, fixed 75) · Knold (straight+4×6, fixed 100) · Tot (straight+5×6, fixed 150) · Kaptajn Vom (straight+6×6, fixed 200) · Lillemor (3+2) · Poeten (4+2) · Momsemor (5+2) · Skipperskræk (6+2) · Radiserne (4+3) · Basserne (5+3) · Gyldenspjæt (6+3) · Kasket Karl (5+4) · Klaus Kludder (6+4) · Jens Lyn (6+5) · Chance · Yatzy (fixed 250 + eyes bonus)
 
-Normal's Yatzy is flat-only (50, no eyes bonus). Family (50) and Giant (250) both include the eyes-bonus variant — confirmed from the source files, corrects an earlier assumption that none of the built-in modes used it. The toggle stays per-mode/per-category either way, so this was just a data correction, not a design change. See "Scoring engine" below.
+Normal's Yatzy is flat-only (50, no eyes bonus). Family (50) and Giant (250) both include the eyes-bonus variant. The toggle stays per-mode/per-category either way. See "Scoring engine" below.
 
 Architecture supports adding a new mode (like Giant was) as close to a **data-only change** as possible: mapping Giant onto Normal/Family's primitives left exactly one genuinely new primitive needed (`straight_plus_extra`, for the Claus/Knold/Tot family) — everything else reused.
 
@@ -42,7 +44,7 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 - **What "hide totals" actually means**: individually entered category scores are always visible to whoever's allowed to see that row (yourself on companion, every player on host) — that's just tracking progress, never hidden. Totals/sums are simply never shown on companion, full stop — no flag, no reveal event, nothing to sync. On the host screen, seeing totals early is a plain local UI toggle (off by default, unsynced, resets on refresh, no DB column — pure personal convenience for the one device running the host view). The actual "reveal" moment — final standings/podium — happens once on the host screen when the game finishes (`sessions.finishedAt` set), not as a separate flag. Server always sends full data (including totals) to every client; hiding is purely a client-side rendering choice, never response filtering.
 - **Late joiners**: explicitly out of scope for v1. The data model doesn't fight this if it comes up anyway (a player added mid-game just starts with a blank card), but no UX is being designed around it.
 - **Typo fixes**: host can rename a player after the fact.
-- **Cross-out / "no score"**: part of the normal per-category entry flow (not a separate button elsewhere), writes a real `0`. No separate flag is needed to distinguish "chose to cross out" from "rolled and it scored zero" — every zero is rule-legitimate (every category except Chance can naturally compute to 0; Chance's minimum is `diceCount × 1`, never zero). Display symbol for a zero (plain `0`, a dash, something else) is still TBD, decide during UI work.
+- **Cross-out / "no score"**: part of the normal per-category entry flow (the "Strike" button, not a separate button elsewhere), writes a real `0`. No separate flag distinguishes "chose to cross out" from "rolled and it scored zero" — every zero is rule-legitimate. **Resolved**: displayed as a dash (`-`), not a plain `0`, so a deliberate/computed zero reads clearly as "filled in" rather than "blank."
 - **Upper section relative display**: each upper-section cell shows a signed delta relative to the per-face target needed for the bonus, not the raw score:
   ```
   delta = actualScore - (requiredCount × faceValue)
@@ -51,23 +53,29 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
   e.g. five 1s on Family → **+1**, three 6s → **-6**. Purely a display computation, no schema impact.
 - **Bonus progress indicator**: running subtotal of the deltas filled in so far, shown near the upper section, so pace-to-bonus is visible at a glance.
 - **Yatzy bonus**: flat bonus, per mode (Normal 50, Family 50, Giant 250), with an optional "extra points equal to eyes rolled" variant (`includeEyesBonus`) kept available per-mode for future custom modes even though none of the three built-in modes currently use it. No stacking bonus for multiple Yatzys in one game.
-- **Backlog (not building now)**: a fun end-of-game screen — animation/fireworks, a podium for the top finishers plus a list of the rest. Needs no new backend or schema, just a results view sorted by final score plus a frontend animation library (e.g. `canvas-confetti`) whenever it gets built.
-- **Backlog (not building now)**: a game history / stats view. Sessions are meant to persist rather than be cleaned up, so this needs no schema changes when it happens — `sessions.finishedAt` (null while in progress) already gives both the "is this game done" filter and the sort order a history list needs.
+- **End-of-game celebration — built**: a `Standings` card (ranked list, standard competition ranking so ties share a rank, trophy icon for 1st) renders on the host screen once `sessions.finishedAt` is set, alongside a one-time `canvas-confetti` burst. The burst is gated on a `false → true` transition of "is this session finished" (tracked in a ref), not on the value simply being `true`, so it fires exactly once per game finishing rather than replaying on every reload or subscription push.
+- **Game history — built**: `session.listFinished` returns every finished session with its players/categories/scores; the create-game screen shows it as a paginated list (10/page), each entry showing the winner(s) and final score via the same ranking helper (`rankPlayers`/`grandTotal`) the Standings card uses, linking through to `/s/$code/game` — viewable without a host token once a game is finished.
+- **Multi-device host access — built, supersedes the original single-hash design**: host auth was originally a single `hostTokenHash` column on `sessions`. Changed to a separate `host_tokens` table (many tokens per session) so a companion device can claim host duties via `session.claimHost` — e.g. the original host's device dies or is put away mid-game — without invalidating the original token. No identity/permission distinction between tokens; any valid one is fully host-equivalent.
+- **Resume sessions across reloads/devices — built**: `rememberedSessions.ts` reads the `yatzy:host:*` / `yatzy:player:*` `localStorage` keys already being written for auth purposes and surfaces them as a "continue where you left off" list on the create-game screen. Purely a client-side convenience — no new schema, and a stale/no-longer-valid entry (session deleted, player removed) quietly removes itself from the list.
+- **Dice entry order — built**: dice are stored client-side as the ordered sequence of taps (`diceEntries: number[]`), not a per-face tally, so the modal displays dice in the order they were entered rather than always sorted low-to-high.
+- **Dice entry guards — built**: the entry modal derives two constraints per category from its `params` at render time — a per-face cap (a single face can never be given more dice than that category could use, e.g. capped at 2 for Two Pairs) and a max-distinct-faces cap (can't spread dice across more faces than the category has groups for, e.g. capped at 2 distinct faces for House). This stops a host from entering a combination that's provably unscoreable for the selected category (e.g. four-of-a-kind for Two Pairs) before they ever hit Submit — the scoring primitives already reject bad shapes by construction (they'd just silently score `0`), this is purely a UX guard against discovering that the hard way.
+- **Off-turn warning — built**: scoring any player out of turn order is, and remains, fully allowed (see `roundProgress` — the "current player" is only a hint). The entry modal shows a non-blocking, dimmed note when the selected player isn't the one considered "up next," to catch accidental mis-clicks without restricting legitimate out-of-order entry.
+- **Backlog (not building now)**: per-session category tweaks (add/remove categories from a mode as a one-off for that game) — see Build order step 8. Not a priority right now.
 
 ---
 
 ## Architecture
 
-- **Hosting**: 100% self-hosted, single Docker image, one container, one volume for the SQLite file. No external/paid services. Served at `yatzy.mydomain.tld` behind an existing reverse proxy (TLS termination handled there — satisfies the PWA service worker's secure-context requirement for free).
-- **Frontend**: Vite + Svelte SPA (not SvelteKit — no SSR/content need), installable PWA via `vite-plugin-pwa`.
-- **Styling**: Tailwind CSS + **shadcn-svelte** (components copied into the repo via CLI, built on headless Bits UI — chosen for the most polished default look, at the cost of a bit more setup than an npm-installed component library).
-- **Client data/state**: TanStack **Query** (cache fed by both request/response calls and WS subscription pushes), TanStack **Table** (the categories × players scorecard grid, since the category list is dynamic per mode), TanStack **Devtools**. Considered and deliberately skipped: Form (defer until the custom mode builder needs it), Store (Svelte's built-in stores already cover this), Virtual (no list in this app is ever long enough to need it), DB (solves distributed/local-first sync problems this app doesn't have).
-- **tRPC ↔ Query wiring**: plain `@trpc/client` (`createTRPCClient`), called manually inside Query's `queryFn`/`mutationFn`, query keys written by hand — not a community Svelte-Query-tRPC adapter. Confirmed at implementation time there's no first-party integration for `@tanstack/svelte-query` (unlike React), only a handful of competing community packages with explicitly incomplete feature parity. More boilerplate per call, but both halves are independently, officially maintained, and it's one fewer new/unstable thing to debug while still learning Svelte.
-- **API/sync**: Fastify + **tRPC** — typed procedures for queries/mutations, typed **subscriptions over WebSocket** for realtime session state (replaces a hand-rolled WS message protocol). Realtime design: an in-memory per-session-code pub/sub hub in the single Node process; mutations write to SQLite then broadcast the full session state to that code's subscribers (state is small, so no diffing — just re-send the whole blob). Implementation-wise, this is a single Node `EventEmitter` (not the `observable()` helper — that's tRPC v10-era; current tRPC v11 subscriptions are async generators, `for await`-ing Node's `events.on(emitter, eventName, { signal })` async iterator, re-yielding the full state on each event).
+- **Hosting**: 100% self-hosted, single Docker image, one container, one volume for the SQLite file. No external/paid services. Served at `yatzy.mydomain.tld` behind an existing reverse proxy (TLS termination handled there — satisfies the PWA service worker's secure-context requirement for free). **Not yet built** — no `Dockerfile`/`docker-compose.yml` in the repo yet; see Build order step 9.
+- **Frontend**: Vite + **React** SPA (not SvelteKit — no SSR/content need). Originally planned as Svelte; the implementation switched to React partway through — everything below reflects the actual React stack, not the original Svelte plan. Installable PWA via `vite-plugin-pwa` — **built**.
+- **Styling**: **Mantine** (`@mantine/core` + `@mantine/hooks`) — component library, not the originally-planned Tailwind + shadcn-svelte (that combination doesn't apply once the frontend is React).
+- **Localization**: `react-i18next`, English + Danish locale files (`common` + `content` namespaces, the latter for game-mode/category copy sourced from the seed data). Not present in the original plan; added during the React build.
+- **Client data/state**: TanStack **Query**, wired via the official `@trpc/react-query` adapter (`createTRPCReact`) — React does have a first-party integration, unlike the Svelte ecosystem the original plan sized this decision for, so the planned manual `createTRPCClient`-in-`queryFn` approach wasn't needed. TanStack **Router** for routing (see below). `@dnd-kit` (`core`/`sortable`/`utilities`) for drag-to-reorder players at game creation. **Not used**: TanStack Table (the categories × players grid is a hand-rolled Mantine `Table`, the dynamic category list didn't end up needing it) or TanStack Form (still no custom-mode builder to justify it).
+- **tRPC ↔ Query wiring**: `trpc.createClient` with a `splitLink` — subscriptions over `wsLink` (WebSocket), everything else over `httpBatchLink`. Realtime design as planned: an in-memory per-session-code pub/sub hub in the single Node process; mutations write to SQLite then broadcast the full session state to that code's subscribers (state is small, so no diffing — just re-send the whole blob), implemented as a Node `EventEmitter`, `for await`-ing `events.on(emitter, eventName, { signal })` inside a tRPC v11 async-generator subscription.
 - **Persistence**: SQLite + Drizzle ORM.
-- **Routing**: `svelte-spa-router` (small, well-worn, not worth hand-rolling even for ~4 routes).
-- **Auth model**: none. Session creation returns an opaque `hostToken` stored in the host's `localStorage`, required on host-only mutations via a tRPC middleware. The session code/QR is the only real boundary — same trust model as a shared paper sheet.
-- **DX tooling**: Biome for linting + formatting (single tool, no ESLint/Prettier) — has genuine, if experimental, Svelte support since v2.3/2.4 (formats and lints the HTML/CSS/JS inside `.svelte` files, including template-aware checks), which is currently ahead of oxc's tooling for this framework (oxlint/oxfmt only see `.svelte` script blocks, no template awareness yet) — evaluated both, went with the mature single-tool option. Bundling is Rolldown-powered for free via Vite 8+ (default since March 2026), no separate package needed. Biome needs `css.parser.tailwindDirectives: true` in `biome.json` to recognize Tailwind v4's custom CSS syntax (`@apply`/`@theme`/`@variant`/`@source`) — off by default, otherwise flags it as unrecognized.
+- **Routing**: **TanStack Router** (`@tanstack/react-router`) — not `svelte-spa-router` (Svelte-specific, doesn't apply to the React build). Typed routes via `createRoute`/`createRootRoute`/`createRouter`.
+- **Auth model**: session creation returns an opaque `hostToken`, stored in the host's `localStorage`, required on host-only mutations via a tRPC middleware — as planned, except tokens now live in a `host_tokens` table (many valid tokens per session) rather than a single hash column on `sessions`, to support multi-device host reclaim (see Product/UX decisions). The session code/QR is still the only real access boundary — same trust model as a shared paper sheet.
+- **DX tooling**: Biome for linting + formatting (single tool, no ESLint/Prettier). The original plan called out Biome's Svelte support specifically as the deciding factor; that reasoning no longer applies now that the frontend is React/TSX, where Biome's support is mature and uncontroversial. Bundling is Rolldown-powered for free via Vite 8+. The Tailwind-specific `biome.json` config note no longer applies (Mantine, not Tailwind).
 
 ---
 
@@ -77,6 +85,7 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 export const gameModes = sqliteTable('game_modes', {
   id: text('id').primaryKey(),                 // "normal" | "family" | "giant" | uuid for custom
   name: text('name').notNull(),
+  description: text('description').notNull(),
   diceCount: integer('dice_count').notNull(),
   isBuiltin: integer('is_builtin', { mode: 'boolean' }).notNull().default(false),
   upperBonusThreshold: integer('upper_bonus_threshold').notNull(),
@@ -110,7 +119,6 @@ export const sessionCategories = sqliteTable('session_categories', {
 export const sessions = sqliteTable('sessions', {
   code: text('code').primaryKey(),              // short human code
   gameModeId: text('game_mode_id').notNull().references(() => gameModes.id),
-  hostTokenHash: text('host_token_hash').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   finishedAt: integer('finished_at', { mode: 'timestamp' }),  // null = in progress, set = finished (also the history sort key)
 });
@@ -127,14 +135,22 @@ export const scores = sqliteTable('scores', {
   playerId: text('player_id').notNull().references(() => players.id),
   categoryId: text('category_id').notNull().references(() => categories.id),
   value: integer('value'),                      // null = not yet entered, 0 = filled in as zero
+  dice: text('dice', { mode: 'json' }).$type<number[]>(), // the dice actually submitted, in entry order; null for a Strike or a fixed-value (straight) category
   updatedAt: integer('updated_at', { mode: 'timestamp' }),
 }, (t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.playerId, t.categoryId] }) }));
+
+export const hostTokens = sqliteTable('host_tokens', {
+  sessionCode: text('session_code').notNull().references(() => sessions.code),
+  tokenHash: text('token_hash').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+}, (t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.tokenHash] }) }));
 ```
 
 Notes:
 - `params`/`exampleDice` as JSON columns (SQLite JSON1 + Drizzle's `mode: 'json'`) avoid a table per primitive shape.
 - Composite primary keys on join-ish tables avoid meaningless surrogate ids.
-- `hostTokenHash` stored hashed so a DB backup doesn't hand out live edit access to an open game.
+- Host tokens are stored hashed, in their own table, so a DB backup doesn't hand out live edit access to an open game, and so more than one token can be valid for the same session (see "Multi-device host access" in Product/UX decisions) — this replaced the original single `sessions.hostTokenHash` column design.
+- `scores.dice` is a later addition (not in the original plan, which assumed dice were never persisted — see "Dice-input UI design" under Open items) — stores exactly what the host submitted, in entry order, so it can be shown back on the score table or when reopening a cell to correct it.
 - `upperBonusThreshold` / `upperBonusAmount` live on `game_modes` so each mode configures its own bonus rule (Normal: 63/50; Family: 84/50; Giant: 189/200).
 - **Category rows are not deduplicated by primitive+params, and sharing a row across modes is optional, never required — but when only the *name* differs, use `gameModeCategories.labelOverride` instead of a separate row.** `house` (Normal/Family) and Giant's "Lillemor" are the same `two_groups_sizes({sizeA:3, sizeB:2})`, same description, same everything except what it's called — that's one category row, referenced by both, with Giant's `game_mode_categories` link setting `labelOverride: "Lillemor"`. Same for `lille`/"Lav", `stor`/"Høj", `royal`/"Cameron". Separate rows are still the right call when something *other* than the name differs (different `params`, different `description`, etc.) — the override only covers "identical in every way except display name."
 - **`sessionCategories` vs. `gameModeCategories`**: `gameModeCategories` is just the default template per built-in mode, used to pre-populate the picker when starting a new game. `sessionCategories` is the resolved, locked-in category list for one specific session — copied from the mode's defaults at creation time, with any per-session add/remove tweaks already applied. This is what actually drives the scorecard, not `gameModeCategories`. See "Per-session category tweaks" below for why this exists as its own table instead of being derived on the fly.
@@ -151,7 +167,7 @@ Notes:
 
 **Yatzy bonus**: self-contained in the single `yatzy` category/primitive, params `{ flatBonus, includeEyesBonus }`. No cross-turn state — evaluated once, same as any other category. No stacking bonus for multiple Yatzys. `includeEyesBonus` is false for all three built-in modes but stays available per-category for future custom modes.
 
-**Primitive catalog** — eight primitives cover all three built-in modes, none of them mode-exclusive except `straight_plus_extra`:
+**Primitive catalog** — eight primitives cover all three built-in modes, none of them mode-exclusive except `straight_plus_extra`. Every primitive derives its own per-face counts from the raw dice array (never trusts a flat total), so combinations that can't legitimately score a category correctly resolve to `0` rather than being miscounted — validated by both the primitive unit tests and the client-side entry guards (see "Dice entry guards" in Product/UX decisions):
 
 - `sum_of_face(face)` — Ones–Sixes, all modes.
 - `n_of_a_kind_sum(requiredCount)` — exactly `requiredCount` dice of the best matching face × face value (not "all matching dice," confirmed). Covers Normal/Family's 3/4-of-a-kind and Giant's 3–11-of-a-kind — one primitive, all three modes.
@@ -160,7 +176,7 @@ Notes:
 - `straight(low, high, fixedScore)` — fixed score if the roll contains at least one of each face in range, else 0; only needs to check presence, not exact roll length, so it already works whether the mode's dice count exactly matches the range (Normal/Family) or the range is a subset of a much bigger roll (Giant's Lav/Høj/Cameron). Covers every straight in every mode, including Family's Royal and Giant's Cameron (both 1-6).
 - `straight_plus_extra(straightLow, straightHigh, extraFace, extraCount, fixedScore)` — the one Giant-only primitive: Lille Claus / Store Claus / Knold / Tot / Kaptajn Vom.
 - `chance()` — sum of all dice, dice-count-agnostic, all modes.
-- `yatzy(dice, { flatBonus, includeEyesBonus, requiredCount })` — flat bonus if some face's count === `requiredCount`; `requiredCount` is passed explicitly from `mode.diceCount` rather than inferred from `dice.length`, since the dice-input UI may hand primitives a trimmed, category-relevant array rather than the full physical roll (see "Dice-input UI design" open item) — `dice.length` can't be trusted to equal the mode's dice count.
+- `yatzy(dice, { flatBonus, includeEyesBonus, requiredCount })` — flat bonus if some face's count === `requiredCount`; `requiredCount` is passed explicitly from `mode.diceCount` rather than inferred from `dice.length`, since the dice-input UI hands primitives a trimmed, category-relevant array rather than the full physical roll — `dice.length` can't be trusted to equal the mode's dice count.
 
 **Default labels**: each primitive is paired with an optional default-label generator (`params → string`), e.g. `two_groups_sizes` defaults to `"{sizeA}+{sizeB} of a Kind"`, `straight` defaults to `"Straight {low}-{high}"`. A category row's stored `label` is an override — if left unset, the UI falls back to the primitive's generated default from that row's `params`. This means most categories (especially future custom-mode ones) never need a hand-written label at all, and the flavorful/named ones (House, Lillemor, Lav, Yatzy, etc.) just set `label` explicitly on their own row.
 
@@ -180,11 +196,14 @@ Notes:
 - `create({ gameModeId, playerNames[] })` → mutation → `{ code, hostToken }`
 - `get({ code })` → query, full current state (initial load / reconnect)
 - `onUpdate({ code })` → **subscription**, emits full session state on every change
-- `submitScore({ code, hostToken, playerId, categoryId, value })` → mutation, host-only
+- `previewScores({ code, diceCounts })` → query, computes what every category in the session *would* score for a given dice tally, without submitting — powers the live score preview in the entry modal.
+- `submitScore({ code, hostToken, playerId, categoryId, value, dice? })` → mutation, host-only. `dice` (added after the original plan) persists the exact dice submitted, in entry order; omitted for a Strike or a fixed-value (straight) category.
 - `addPlayer` / `removePlayer` / `renamePlayer` → mutation, host-only
-- `endGame({ code, hostToken })` → mutation, host-only, stamps `sessions.finishedAt`. Exact trigger conditions (auto-detected when every category/player combo has a score vs. an explicit host action to stop early) still TBD, but the procedure and column are the same regardless — just deciding what calls it and when.
+- `endGame({ code, hostToken })` → mutation, host-only, stamps `sessions.finishedAt`.
+- `listFinished()` → query, all finished sessions with players/categories/scores — **added after the original plan**, backs the game-history list.
+- `claimHost({ code })` → mutation, issues a new valid `hostToken` for an existing session — **added after the original plan**, backs multi-device host reclaim. No auth required to call it (same trust model as the session code itself: anyone with the code/QR already has host-equivalent access via the "Become host" flow).
 
-Host-only procedures go through a `hostProcedure` middleware that checks the supplied `hostToken` against the session row and throws `UNAUTHORIZED` on mismatch. `onUpdate` needs no token — readable by anyone with the code.
+Host-only procedures go through a `hostProcedure` middleware that checks the supplied `hostToken` against the `host_tokens` table (any matching row for that session code is valid, not just one) and throws `UNAUTHORIZED` on mismatch. `onUpdate`, `listFinished`, and `claimHost` need no token — readable/claimable by anyone with the code.
 
 ---
 
@@ -192,56 +211,68 @@ Host-only procedures go through a `hostProcedure` middleware that checks the sup
 
 ```
 /apps
-  /web              Vite + Svelte SPA
+  /web              Vite + React SPA
     src/
-      routes/         route-level components
+      Root.tsx        layout shell (locale switcher, home nav button)
+      router.tsx       TanStack Router route tree
+      routes/          route-level components: CreateGame, Host, View, PlayerView
       lib/
-        api/           tRPC client + Query client setup
-        components/     ScoreGrid (TanStack Table), CategoryTooltip, PlayerCard, DiceInput
-        stores/          small local UI state (theme, per-session hostToken map)
+        api/            trpc client/react-query wiring (trpc.ts, trpc-client.ts, types.ts), useSessionState hook
+        components/      ScoreTable (Mantine Table, category tooltips, per-player columns), DieFace, Standings,
+                          InviteQr, SortablePlayerRow (dnd-kit)
+        i18n/            react-i18next setup + en/da locale files (common + content namespaces)
+        scoring.ts       client-side derived-value helpers (roundProgress, rankPlayers/grandTotal, targetDiceCount, etc.)
+        rememberedSessions.ts   localStorage-backed "continue where you left off" list
+        formatDate.ts     small date/time formatting helpers
   /server           Fastify + tRPC
     src/
       routers/        catalog.ts, session.ts, index.ts (appRouter)
       db/
         schema.ts       (drizzle schema)
         seed.ts
-        client.ts
+        db-client.ts
+        drizzle/         generated migrations + snapshots
       scoring/
         primitives.ts   pure scoring functions
         primitives.test.ts
-      ws/
-        hub.ts          per-session pub/sub, used by the onUpdate subscription
+      ws-hub.ts        per-session pub/sub, used by the onUpdate subscription
       index.ts          Fastify bootstrap: tRPC plugin, static file serving for /apps/web build output
-Dockerfile
-docker-compose.yml
+Dockerfile          not yet created
+docker-compose.yml  not yet created
 pnpm-workspace.yaml
 ```
 
-Routes: `/` (create game), `/s/:code/host` (host control, gated by matching `hostToken` in `localStorage`), `/s/:code/view` (pick your player), `/s/:code/view/:playerId` (companion scorecard).
+Routes: `/` (create game, plus "continue" and history lists), `/s/:code/game` (host control, gated by matching `hostToken` in `localStorage` — renamed from the originally-planned `/s/:code/host` since this route now also displays a finished game's standings, not just active hosting), `/s/:code/view` (pick your player), `/s/:code/view/:playerId` (companion scorecard, with a "become host" option if no host token is present for that session).
 
 ---
 
 ## Build order
 
-0. Repo setup: `git init`, pnpm workspace (`pnpm-workspace.yaml` pointing at `apps/*`), `apps/web` and `apps/server` package.json + tsconfig each, root `.gitignore`.
-1. Scoring primitives + full unit test suite (Vitest) — pure functions, no DB/server yet.
-2. SQLite schema (Drizzle) + seed script for **all three built-in modes** (Normal, Family, and Giant — done together rather than deferring Giant, since the full category/primitive mapping was already worked out during planning). Confirmed no new primitives were needed beyond `straight_plus_extra`, matching the original extensibility goal.
-3. Fastify + tRPC server: routers, WS hub, wired to SQLite.
-4. Svelte SPA prototype: create game, add players, pick mode, enter dice → auto-score, live via subscription from day one.
-5. Companion view (session code/QR join, pick player, read-only).
-6. Hide/reveal totals toggle.
-7. Category info tooltips (from DB `description`/`example_dice`).
-8. **Deferred (post-v1)** — Per-session category tweak UI at game creation (add/remove categories from the chosen mode, one-off, writes the resolved list to `sessionCategories` — not a saved mode) — bring in TanStack Form here when it's picked back up.
-9. PWA manifest/service worker polish + Dockerfile + docker-compose for self-hosting.
+0. ✅ Repo setup: `git init`, pnpm workspace (`pnpm-workspace.yaml` pointing at `apps/*`), `apps/web` and `apps/server` package.json + tsconfig each, root `.gitignore`.
+1. ✅ Scoring primitives + full unit test suite (Vitest) — pure functions, no DB/server yet.
+2. ✅ SQLite schema (Drizzle) + seed script for all three built-in modes (Normal, Family, Giant). Confirmed no new primitives were needed beyond `straight_plus_extra`.
+3. ✅ Fastify + tRPC server: routers, WS hub, wired to SQLite.
+4. ✅ Frontend prototype: create game, add players, pick mode, enter dice → auto-score, live via subscription from day one. **Built in React, not the originally-planned Svelte** — see Architecture.
+5. ✅ Companion view (session code/QR join, pick player, read-only).
+6. ✅ Hide/reveal totals toggle.
+7. ✅ Category info tooltips (from DB `description`/`example_dice`).
+8. ⏸️ **Deferred, not a current priority** — Per-session category tweak UI at game creation (add/remove categories from the chosen mode, one-off, writes the resolved list to `sessionCategories` — not a saved mode).
+9. ◐ **Partially done** — PWA manifest/service worker: ✅ done (`vite-plugin-pwa`, iOS home-screen meta tags, manifest icon path fix). Dockerfile + docker-compose for self-hosting: **not started**.
 
-Backlog (post-v1): per-session category tweaks (step 8 above); end-of-game celebration screen + podium/standings; game history / stats view (see Product/UX decisions — needs no schema changes when it happens).
+Also built, beyond the original build order:
+- ✅ Multi-device host access (`host_tokens` table, `claimHost`) and "continue where you left off" / game history on the create-game screen.
+- ✅ End-of-game celebration (Standings card + confetti) and game history — these were listed as backlog/"not building now" in the original plan and have since been built; see Product/UX decisions.
+- ✅ Dice persisted per score submission (in entry order) and shown back on the score table / when reopening a cell — the original plan assumed dice were never persisted (see Open items below); that assumption changed.
+- ✅ Category-aware dice entry guards (per-face cap + max-distinct-faces cap) so the entry UI can't produce a combination that's provably unscoreable for the selected category.
+- ✅ Off-turn entry warning (non-blocking) in the host's scoring modal.
+- ✅ Localization (English/Danish).
 
 ---
 
 ## Open items (small, non-blocking)
 
-- Dice-input UI design (how a roll gets entered before scoring a category) — resolved principle: input should be **category-aware**, not a universal "tap all N dice" grid. Since dice values are never persisted (only the computed `scores.value` is stored), the UI only needs to collect enough to drive the selected category's specific primitive (e.g. a "which face, how many" picker for n-of-a-kind/pairs/group categories, a straight checklist, a single face picker for Yatzy) rather than requiring every one of the 12 dice to be entered individually for Giant. Exact widget design per primitive shape still TBD.
-- Session short-code generation scheme (e.g. word-pair like "BEAR-217" vs random) and QR generation library.
-- Cross-out display symbol (plain `0`, a dash, or something else).
-- Tooltip copy (description + example dice) for every category across all three modes — the scoring rules and point values are now fully settled (source: `5-dice.txt`, `6-dice.txt`, `giant.txt`), just the explanatory text/examples are left to write during seeding.
-- Category `id`/slug naming for the seed data, including how to handle Giant's Danish names (e.g. keep "Lillemor" etc. as the display label — probably worth keeping, it's charming and specific — vs. a plain English slug for the internal `id`).
+- ✅ **Dice-input UI design** — resolved. Category-aware, not a universal "tap all N dice" grid: per-face steppers, capped per-category (see "Dice entry guards" in Product/UX decisions) so only a scoreable subset can be entered. **Supersedes the original plan's assumption that dice values are never persisted** — they now are (`scores.dice`, entry order preserved), so they can be shown back on the score table and pre-filled when reopening a cell to correct it.
+- ✅ **Session short-code generation** — resolved as a random 6-digit numeric code (not the word-pair idea originally floated), regenerated on collision.
+- ✅ **Cross-out display symbol** — resolved as a dash (`-`), see Product/UX decisions.
+- ✅ **Tooltip copy** — description + example dice filled in for every category across all three modes.
+- ✅ **Category `id`/slug naming** — resolved: plain English slugs for `id` (e.g. `three_of_a_kind`), Giant's Danish flavor names (Lillemor, Skipperskræk, etc.) kept as the display `label`/`labelOverride` rather than the slug.
