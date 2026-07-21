@@ -205,3 +205,76 @@ export function roundProgress(sessionState: {
 
 	return { currentRound, totalRounds, isComplete, currentPlayerId };
 }
+
+interface RankInput {
+	players: { id: string; name: string }[];
+	categories: { id: string; section: "upper" | "lower" }[];
+	scores: { playerId: string; categoryId: string; value: number | null }[];
+}
+
+interface BonusInfo {
+	upperBonusThreshold: number;
+	upperBonusAmount: number;
+}
+
+// The grand total is the sum of all scored categories, plus any upper bonus
+// if the upper section subtotal meets or exceeds the threshold. Unscored
+// categories are treated as zero, so the total is always defined.
+export function grandTotal(
+	sessionState: RankInput,
+	gameMode: BonusInfo | undefined,
+	playerId: string,
+): number {
+	const scoreFor = (categoryId: string) =>
+		sessionState.scores.find(
+			(s) => s.playerId === playerId && s.categoryId === categoryId,
+		)?.value ?? 0;
+
+	const upperSubtotal = sessionState.categories
+		.filter((c) => c.section === "upper")
+		.reduce((sum, c) => sum + scoreFor(c.id), 0);
+
+	const bonus =
+		gameMode && upperSubtotal >= gameMode.upperBonusThreshold
+			? gameMode.upperBonusAmount
+			: 0;
+
+	const lowerSubtotal = sessionState.categories
+		.filter((c) => c.section === "lower")
+		.reduce((sum, c) => sum + scoreFor(c.id), 0);
+
+	return upperSubtotal + bonus + lowerSubtotal;
+}
+
+export interface RankedPlayer {
+	id: string;
+	name: string;
+	total: number;
+	rank: number;
+}
+
+// Standard competition ranking (1, 2, 2, 4) — tied players share a rank,
+// the next distinct total resumes at their position in the sorted list.
+export function rankPlayers(
+	sessionState: RankInput,
+	gameMode: BonusInfo | undefined,
+): RankedPlayer[] {
+	const sorted = sessionState.players
+		.map((player) => ({
+			id: player.id,
+			name: player.name,
+			total: grandTotal(sessionState, gameMode, player.id),
+		}))
+		.sort((a, b) => b.total - a.total);
+
+	const ranked: RankedPlayer[] = [];
+	sorted.forEach((player, index) => {
+		const rank =
+			index > 0 && player.total === sorted[index - 1].total
+				? ranked[index - 1].rank
+				: index + 1;
+		ranked.push({ ...player, rank });
+	});
+
+	return ranked;
+}

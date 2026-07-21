@@ -222,8 +222,10 @@ export function ScoreTable({
 
 	// Hiding is a host-only convenience (e.g. to avoid spoiling standings on a
 	// shared screen) — companions (no onCellClick) always see their own total.
+	// If the session is finished, totals are always revealed.
 	const [totalsRevealed, setTotalsRevealed] = useState(false);
-	const canToggleTotals = Boolean(onCellClick);
+	const isFinished = Boolean(sessionState.session.finishedAt);
+	const canToggleTotals = Boolean(onCellClick) && !isFinished;
 	const totalsHidden = canToggleTotals && !totalsRevealed;
 
 	const players = onlyPlayerId

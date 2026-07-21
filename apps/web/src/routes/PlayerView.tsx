@@ -1,7 +1,9 @@
-import { Loader, Stack, Text, Title } from "@mantine/core";
-import { getRouteApi } from "@tanstack/react-router";
+import { Button, Loader, Popover, Stack, Text, Title } from "@mantine/core";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { trpc } from "$lib/api/trpc";
 import { useSessionState } from "$lib/api/useSessionState";
 import { InviteQr } from "$lib/components/InviteQr";
 import { ScoreTable } from "$lib/components/ScoreTable";
@@ -16,6 +18,16 @@ export default function PlayerView() {
 	const { code: sessionCode, playerId } = route.useParams();
 	const { sessionState, subscriptionError, gameMode } =
 		useSessionState(sessionCode);
+
+	const navigate = useNavigate();
+	const [claimOpened, setClaimOpened] = useState(false);
+
+	const claimHost = trpc.session.claimHost.useMutation({
+		onSuccess: (data) => {
+			localStorage.setItem(`yatzy:host:${sessionCode}`, data.hostToken);
+			navigate({ to: "/s/$code/game", params: { code: sessionCode } });
+		},
+	});
 
 	if (subscriptionError) {
 		return (
@@ -70,6 +82,42 @@ export default function PlayerView() {
 				</Text>
 				<InviteQr sessionCode={sessionCode} position="bottom" />
 			</Stack>
+
+			{!sessionState.session.finishedAt &&
+				!localStorage.getItem(`yatzy:host:${sessionCode}`) && (
+					<Popover
+						opened={claimOpened}
+						onChange={setClaimOpened}
+						withArrow
+						shadow="md"
+						position="top"
+					>
+						<Popover.Target>
+							<Button
+								variant="subtle"
+								color="gray"
+								size="compact-sm"
+								onClick={() => setClaimOpened((o) => !o)}
+							>
+								{t("playerView.becomeHost")}
+							</Button>
+						</Popover.Target>
+						<Popover.Dropdown maw={240}>
+							<Stack gap="xs" ta="center">
+								<Text size="sm" c="dimmed">
+									{t("playerView.becomeHostConfirm")}
+								</Text>
+								<Button
+									size="sm"
+									loading={claimHost.isPending}
+									onClick={() => claimHost.mutate({ sessionCode })}
+								>
+									{t("playerView.becomeHostSubmit")}
+								</Button>
+							</Stack>
+						</Popover.Dropdown>
+					</Popover>
+				)}
 		</Stack>
 	);
 }

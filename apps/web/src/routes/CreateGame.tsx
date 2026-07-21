@@ -17,10 +17,14 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
 	ActionIcon,
+	Box,
 	Button,
 	Card,
+	Divider,
+	Flex,
 	Group,
 	Loader,
+	Pagination,
 	Select,
 	type SelectProps,
 	Stack,
@@ -29,11 +33,19 @@ import {
 	Title,
 } from "@mantine/core";
 import { IconGripVertical, IconMinus } from "@tabler/icons-react";
-import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { trpc } from "$lib/api/trpc";
+import type { RouterOutputs } from "$lib/api/types";
+import { formatDate, formatDateTime } from "$lib/formatDate";
+import {
+	forgetSession,
+	getRememberedSessions,
+	type RememberedSession,
+} from "$lib/rememberedSessions";
+import { rankPlayers } from "$lib/scoring";
 
 function SortablePlayerRow({
 	player,
@@ -97,9 +109,129 @@ function SortablePlayerRow({
 	);
 }
 
+function HistoryEntry({
+	session,
+	gameMode,
+}: {
+	session: RouterOutputs["session"]["listFinished"][number];
+	gameMode: RouterOutputs["catalog"]["listGameModes"][number] | undefined;
+}) {
+	const { t: tc } = useTranslation("content");
+	const winners = rankPlayers(session, gameMode).filter((p) => p.rank === 1);
+
+	return (
+		<Link
+			to="/s/$code/game"
+			params={{ code: session.sessionCode }}
+			style={{ textDecoration: "none", color: "inherit" }}
+		>
+			<Group justify="space-between" wrap="nowrap" gap="xs" py={6}>
+				<Group gap={6} wrap="nowrap">
+					<Text size="sm" fw={600}>
+						{winners.map((w) => w.name).join(" / ")}
+					</Text>
+					<Text size="sm" c="dimmed">
+						· {winners[0]?.total}
+					</Text>
+				</Group>
+				<Text size="xs" c="dimmed">
+					{gameMode && tc(`gameModes.${gameMode.id}.name`)} ·{" "}
+					{formatDate(new Date(session.finishedAt ?? session.createdAt))}
+				</Text>
+			</Group>
+		</Link>
+	);
+}
+
+function ContinueEntry({
+	remembered,
+	gameModes,
+	showDividerAfter,
+	onVisibilityChange,
+}: {
+	remembered: RememberedSession;
+	gameModes: RouterOutputs["catalog"]["listGameModes"] | undefined;
+	showDividerAfter: boolean;
+	onVisibilityChange: (code: string, visible: boolean) => void;
+}) {
+	const { t } = useTranslation();
+	const { t: tc } = useTranslation("content");
+	const session = trpc.session.get.useQuery({ sessionCode: remembered.code });
+
+	const isStale =
+		session.isError ||
+		(session.data &&
+			(session.data.session.finishedAt ||
+				(remembered.role === "player" &&
+					!session.data.players.some((p) => p.id === remembered.playerId))));
+
+	const isVisible = Boolean(session.data) && !isStale;
+
+	useEffect(() => {
+		onVisibilityChange(remembered.code, isVisible);
+	}, [isVisible, remembered.code, onVisibilityChange]);
+
+	useEffect(() => {
+		if (isStale) forgetSession(remembered.code);
+	}, [isStale, remembered.code]);
+
+	if (!isVisible || !session.data) return null;
+
+	const gameMode = gameModes?.find(
+		(m) => m.id === session.data.session.gameModeId,
+	);
+
+	const createdAt = new Date(session.data.session.createdAt);
+
+	const inner = (
+		<Group justify="space-between" wrap="nowrap" py={6}>
+			<Group gap={6} wrap="nowrap">
+				<Text size="sm" fw={600}>
+					{gameMode && tc(`gameModes.${gameMode.id}.name`)}{" "}
+				</Text>
+				<Text size="sm" c="dimmed">
+					·{" "}
+					{t("createGame.playerCount", { count: session.data.players.length })}
+				</Text>
+			</Group>
+			<Text size="xs" c="dimmed">
+				{formatDateTime(createdAt)}
+			</Text>
+		</Group>
+	);
+
+	const link =
+		remembered.role === "host" ? (
+			<Link
+				to="/s/$code/game"
+				params={{ code: remembered.code }}
+				style={{ textDecoration: "none", color: "inherit" }}
+			>
+				{inner}
+			</Link>
+		) : (
+			<Link
+				to="/s/$code/view/$playerId"
+				params={{ code: remembered.code, playerId: remembered.playerId }}
+				style={{ textDecoration: "none", color: "inherit" }}
+			>
+				{inner}
+			</Link>
+		);
+
+	return (
+		<>
+			{link}
+			{showDividerAfter && <Divider />}
+		</>
+	);
+}
+
 export default function CreateGame() {
 	const { t } = useTranslation();
 	const { t: tc } = useTranslation("content");
+
+	const HISTORY_PAGE_SIZE = 10;
 
 	const navigate = useNavigate();
 	const gameModes = trpc.catalog.listGameModes.useQuery();
@@ -109,6 +241,27 @@ export default function CreateGame() {
 		{ id: crypto.randomUUID(), name: "" },
 	]);
 	const [joinCode, setJoinCode] = useState("");
+	const [rememberedSessions] = useState(() => getRememberedSessions());
+	const [historyPage, setHistoryPage] = useState(1);
+
+	const [visibleContinueCodes, setVisibleContinueCodes] = useState<Set<string>>(
+		new Set(),
+	);
+	const handleContinueVisibilityChange = useCallback(
+		(code: string, visible: boolean) => {
+			setVisibleContinueCodes((prev) => {
+				if (visible === prev.has(code)) return prev;
+				const next = new Set(prev);
+				if (visible) next.add(code);
+				else next.delete(code);
+				return next;
+			});
+		},
+		[],
+	);
+	const visibleContinueOrder = rememberedSessions
+		.map((r) => r.code)
+		.filter((code) => visibleContinueCodes.has(code));
 
 	useEffect(() => {
 		if (selectedModeId !== null || !gameModes.data) return;
@@ -119,9 +272,18 @@ export default function CreateGame() {
 	const createSession = trpc.session.create.useMutation({
 		onSuccess: (data) => {
 			localStorage.setItem(`yatzy:host:${data.sessionCode}`, data.hostToken);
-			navigate({ to: "/s/$code/host", params: { code: data.sessionCode } });
+			navigate({ to: "/s/$code/game", params: { code: data.sessionCode } });
 		},
 	});
+
+	const finishedGames = trpc.session.listFinished.useQuery();
+	const historyTotalPages = Math.ceil(
+		(finishedGames.data?.length ?? 0) / HISTORY_PAGE_SIZE,
+	);
+	const historyPageItems = finishedGames.data?.slice(
+		(historyPage - 1) * HISTORY_PAGE_SIZE,
+		historyPage * HISTORY_PAGE_SIZE,
+	);
 
 	function addPlayer() {
 		setPlayers((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
@@ -177,14 +339,14 @@ export default function CreateGame() {
 	const renderModeOption: SelectProps["renderOption"] = ({ option }) => {
 		const mode = gameModes.data?.find((m) => m.id === option.value);
 		return (
-			<div>
+			<Box>
 				<Text size="sm">{option.label}</Text>
 				{mode && (
 					<Text size="xs" c="dimmed">
 						{tc(`gameModes.${mode.id}.description`)}
 					</Text>
 				)}
-			</div>
+			</Box>
 		);
 	};
 
@@ -196,12 +358,12 @@ export default function CreateGame() {
 
 			<Card withBorder radius="md" p="lg" w="100%">
 				<Stack gap="lg">
-					<div>
+					<Box>
 						<Title order={3}>{t("createGame.heading")}</Title>
 						<Text c="dimmed" size="sm">
 							{t("createGame.subheading")}
 						</Text>
-					</div>
+					</Box>
 
 					{gameModes.isPending ? (
 						<Loader size="sm" color="gray" />
@@ -247,6 +409,8 @@ export default function CreateGame() {
 						</Button>
 					</Stack>
 
+					<Divider />
+
 					{createSession.isError && (
 						<Text c="red" size="sm">
 							{createSession.error.message}
@@ -266,12 +430,12 @@ export default function CreateGame() {
 
 			<Card withBorder radius="md" p="lg" w="100%">
 				<Stack gap="sm">
-					<div>
+					<Box>
 						<Title order={3}>{t("createGame.joinHeading")}</Title>
 						<Text c="dimmed" size="sm">
 							{t("createGame.joinSubheading")}
 						</Text>
-					</div>
+					</Box>
 					<Group gap="xs" wrap="nowrap">
 						<TextInput
 							placeholder={t("createGame.joinCodePlaceholder")}
@@ -289,6 +453,71 @@ export default function CreateGame() {
 					</Group>
 				</Stack>
 			</Card>
+
+			{rememberedSessions.length > 0 && (
+				<Card withBorder radius="md" p="lg" w="100%">
+					<Stack gap="sm">
+						<Box>
+							<Title order={3}>{t("createGame.continueHeading")}</Title>
+							<Text c="dimmed" size="sm">
+								{t("createGame.continueSubheading")}
+							</Text>
+						</Box>
+						<Stack gap={0}>
+							{rememberedSessions.map((remembered) => (
+								<ContinueEntry
+									key={remembered.code}
+									remembered={remembered}
+									gameModes={gameModes.data}
+									showDividerAfter={
+										visibleContinueOrder.indexOf(remembered.code) <
+											visibleContinueOrder.length - 1 &&
+										visibleContinueOrder.includes(remembered.code)
+									}
+									onVisibilityChange={handleContinueVisibilityChange}
+								/>
+							))}
+						</Stack>
+					</Stack>
+				</Card>
+			)}
+
+			{historyPageItems && historyPageItems.length > 0 && (
+				<Card withBorder radius="md" p="lg" w="100%">
+					<Stack gap="sm">
+						<Box>
+							<Title order={3}>{t("createGame.historyHeading")}</Title>
+							<Text c="dimmed" size="sm">
+								{t("createGame.historySubheading")}
+							</Text>
+						</Box>
+						<Stack gap={0}>
+							{historyPageItems.map((session, index) => (
+								<Fragment key={session.sessionCode}>
+									{index > 0 && <Divider />}
+									<HistoryEntry
+										session={session}
+										gameMode={gameModes.data?.find(
+											(m) => m.id === session.gameModeId,
+										)}
+									/>
+								</Fragment>
+							))}
+						</Stack>
+						{historyTotalPages > 1 && (
+							<Flex justify="center" mt="sm">
+								<Pagination
+									value={historyPage}
+									onChange={setHistoryPage}
+									total={historyTotalPages}
+									size="sm"
+									mt="xs"
+								/>
+							</Flex>
+						)}
+					</Stack>
+				</Card>
+			)}
 		</Stack>
 	);
 }

@@ -15,7 +15,8 @@ import {
 } from "@mantine/core";
 import { IconUserPlus } from "@tabler/icons-react";
 import { getRouteApi } from "@tanstack/react-router";
-import { Fragment, useState } from "react";
+import confetti from "canvas-confetti";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { trpc } from "$lib/api/trpc";
@@ -23,6 +24,7 @@ import { useSessionState } from "$lib/api/useSessionState";
 import { DieFace } from "$lib/components/DieFace";
 import { InviteQr } from "$lib/components/InviteQr";
 import { ScoreTable } from "$lib/components/ScoreTable";
+import { Standings } from "$lib/components/Standings";
 import {
 	exampleDiceGroups,
 	fixedValue,
@@ -43,6 +45,16 @@ export default function Host() {
 
 	const { sessionState, subscriptionError, gameMode } =
 		useSessionState(sessionCode);
+
+	const wasFinished = useRef<boolean | undefined>(undefined);
+	useEffect(() => {
+		if (!sessionState) return;
+		const isFinished = Boolean(sessionState.session.finishedAt);
+		if (wasFinished.current === false && isFinished) {
+			confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+		}
+		wasFinished.current = isFinished;
+	}, [sessionState]);
 
 	const players = sessionState?.players ?? [];
 	const { currentRound, totalRounds, isComplete, currentPlayerId } =
@@ -272,7 +284,7 @@ export default function Host() {
 		return <Loader size="sm" color="gray" />;
 	}
 
-	if (!hostToken) {
+	if (!hostToken && !sessionState.session.finishedAt) {
 		return (
 			<Text c="red" size="sm">
 				{t("host.missingHostAccess")}
@@ -316,19 +328,25 @@ export default function Host() {
 				)}
 			</Stack>
 
+			{sessionState.session.finishedAt && (
+				<Standings sessionState={sessionState} gameMode={gameMode} />
+			)}
+
 			<ScoreTable
 				sessionState={sessionState}
 				gameMode={gameMode}
-				onCellClick={selectCell}
+				onCellClick={
+					hostToken && !sessionState.session.finishedAt ? selectCell : undefined
+				}
 				currentPlayerId={currentPlayerId}
 				onRenamePlayer={
-					rosterLocked
+					rosterLocked || !hostToken
 						? undefined
 						: (playerId, name) =>
 								renamePlayer.mutate({ sessionCode, hostToken, playerId, name })
 				}
 				onRemovePlayer={
-					rosterLocked
+					rosterLocked || !hostToken
 						? undefined
 						: (playerId) =>
 								removePlayer.mutate({ sessionCode, hostToken, playerId })
