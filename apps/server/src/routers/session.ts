@@ -254,10 +254,11 @@ export const sessionRouter = router({
 				playerId: z.string(),
 				categoryId: z.string(),
 				value: z.number(),
+				dice: z.array(z.number()).optional(),
 			}),
 		)
 		.mutation(
-			async ({ input: { sessionCode, playerId, categoryId, value } }) => {
+			async ({ input: { sessionCode, playerId, categoryId, value, dice } }) => {
 				client
 					.insert(scores)
 					.values({
@@ -265,11 +266,12 @@ export const sessionRouter = router({
 						playerId,
 						categoryId,
 						value,
+						dice: dice ?? null,
 						updatedAt: new Date(),
 					})
 					.onConflictDoUpdate({
 						target: [scores.sessionCode, scores.playerId, scores.categoryId],
-						set: { value, updatedAt: new Date() },
+						set: { value, dice: dice ?? null, updatedAt: new Date() },
 					})
 					.run();
 

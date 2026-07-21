@@ -269,6 +269,39 @@ export function ScoreTable({
 		);
 	}
 
+	function ScoreDicePopover({
+		dice,
+		children,
+	}: {
+		dice: number[];
+		children: ReactNode;
+	}) {
+		const [opened, setOpened] = useState(false);
+		return (
+			<Popover
+				opened={opened}
+				onChange={setOpened}
+				withArrow
+				shadow="md"
+				position="bottom"
+			>
+				<Popover.Target>
+					<UnstyledButton onClick={() => setOpened((o) => !o)}>
+						{children}
+					</UnstyledButton>
+				</Popover.Target>
+				<Popover.Dropdown>
+					<Group gap={4} wrap="wrap" maw={200} justify="center">
+						{dice.map((face, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: dice are indistinguishable
+							<DieFace key={i} value={face} size={28} active />
+						))}
+					</Group>
+				</Popover.Dropdown>
+			</Popover>
+		);
+	}
+
 	function renderCategoryRows(categories: Category[]) {
 		return categories.map((category) => (
 			<Table.Tr key={category.id}>
@@ -301,6 +334,12 @@ export function ScoreTable({
 										display
 									)}
 								</Button>
+							) : score?.dice && score.dice.length > 0 ? (
+								<ScoreDicePopover dice={score.dice}>
+									<Text span style={{ cursor: "pointer" }}>
+										{display}
+									</Text>
+								</ScoreDicePopover>
 							) : (
 								display
 							)}

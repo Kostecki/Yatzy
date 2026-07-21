@@ -108,6 +108,7 @@ export const scores = sqliteTable(
 			.references(() => categories.id, { onDelete: "cascade" })
 			.notNull(),
 		value: integer("value"),
+		dice: text("dice", { mode: "json" }).$type<number[]>(),
 		updatedAt: integer("updated_at", { mode: "timestamp" }),
 	},
 	(t) => ({

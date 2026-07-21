@@ -59,13 +59,15 @@ export default function Host() {
 	const [selected, setSelected] = useState<
 		{ playerId: string; categoryId: string } | undefined
 	>(undefined);
-	const [diceCounts, setDiceCounts] = useState<number[]>([0, 0, 0, 0, 0, 0]);
+	const [diceEntries, setDiceEntries] = useState<number[]>([]);
 	const [newPlayerName, setNewPlayerName] = useState("");
 	const [addPlayerOpened, setAddPlayerOpened] = useState(false);
 
-	const diceTotal = diceCounts.reduce((a, b) => a + b, 0);
-	const selectedDice = diceCounts.flatMap((count, i) =>
-		Array(count).fill(i + 1),
+	const diceTotal = diceEntries.length;
+	const selectedDice = diceEntries;
+	const diceCounts = Array.from(
+		{ length: 6 },
+		(_, i) => diceEntries.filter((f) => f === i + 1).length,
 	);
 
 	const selectedCategory = sessionState?.categories.find(
@@ -84,17 +86,50 @@ export default function Host() {
 	const fixedDiceGroups = selectedCategory
 		? exampleDiceGroups(selectedCategory, gameMode?.diceCount)
 		: undefined;
+
 	// Some Yatzy variants (Family/Giant) add the face value on top of the flat
 	// bonus, so unlike Normal's Yatzy, which face you roll actually matters.
 	const includesEyesBonus =
 		selectedCategory?.primitive === "yatzy" &&
 		(selectedCategory.params as { includeEyesBonus: boolean }).includeEyesBonus;
+
 	// Upper-section categories only score dice showing one specific face — the
 	// other faces don't affect the result, so there's nothing to enter for them.
 	const relevantFace =
 		selectedCategory?.primitive === "sum_of_face"
 			? (selectedCategory.params as { face: number }).face
 			: undefined;
+
+	// Some categories have a hard cap on how many dice are relevant to the score
+	// (e.g. Three of a Kind only needs 3, not all 5/6/12). This is used to show
+	// a divider in the dice row, and to prevent entering more than that many.
+	const perFaceCap =
+		selectedCategory?.primitive === "n_groups_of_size"
+			? (selectedCategory.params as { size: number }).size
+			: selectedCategory?.primitive === "two_groups_sizes"
+				? Math.max(
+						...Object.values(
+							selectedCategory.params as { sizeA: number; sizeB: number },
+						),
+					)
+				: selectedCategory?.primitive === "n_of_a_kind_sum" ||
+						selectedCategory?.primitive === "yatzy"
+					? (selectedCategory.params as { requiredCount: number }).requiredCount
+					: undefined;
+
+	// Some categories require a specific number of distinct faces to be rolled (e.g.
+	// House needs 2, Full Straight needs 5). This is used to prevent entering more
+	// than that many distinct faces.
+	const maxDistinctFaces =
+		selectedCategory?.primitive === "n_of_a_kind_sum" ||
+		selectedCategory?.primitive === "yatzy"
+			? 1
+			: selectedCategory?.primitive === "n_groups_of_size"
+				? (selectedCategory.params as { groups: number }).groups
+				: selectedCategory?.primitive === "two_groups_sizes"
+					? 2 // House-style categories always need exactly two distinct faces
+					: undefined;
+
 	// Most categories only need a handful of dice to determine the score (e.g.
 	// Three of a Kind needs 3, not all 5/6/12) — shown as a divider in the dice
 	// row rather than a hard cap, since you can still physically have rolled
@@ -105,15 +140,19 @@ export default function Host() {
 		? targetDiceCount(selectedCategory, gameMode?.diceCount)
 		: undefined;
 	const diceCapacity = gameMode?.diceCount;
+
 	// Most categories are ready to preview/submit once the target is reached,
-	// even if more dice could still be entered. A relevant-face category only
-	// needs that one count, so it's always ready.
+	// even if more dice could still be entered. A relevant-face category is
+	// ready as soon as at least one die is entered — a genuine "zero of this
+	// face" should go through Strike instead, so Submit doesn't stay live on
+	// an empty/reset selection and risk silently overwriting a prior score.
 	const diceComplete =
 		relevantFace !== undefined
-			? true
+			? diceTotal > 0
 			: target !== undefined
 				? diceTotal >= target
 				: diceCapacity !== undefined && diceTotal === diceCapacity;
+
 	// Ones-Sixes has no hard target (see above), but it still has a "you're on
 	// pace for the bonus" marker worth showing in the dice row.
 	const diceRowDivider =
@@ -124,12 +163,15 @@ export default function Host() {
 			: target;
 
 	function resetDice() {
-		setDiceCounts([0, 0, 0, 0, 0, 0]);
+		setDiceEntries([]);
 	}
 
 	function selectCell(playerId: string, categoryId: string) {
 		setSelected({ playerId, categoryId });
-		resetDice();
+		const existingDice = sessionState?.scores.find(
+			(s) => s.playerId === playerId && s.categoryId === categoryId,
+		)?.dice;
+		setDiceEntries(existingDice ?? []);
 	}
 
 	function closePanel() {
@@ -140,15 +182,26 @@ export default function Host() {
 	function incrementFace(face: number) {
 		if (relevantFace !== undefined && face !== relevantFace) return;
 		if (diceTotal >= (diceCapacity ?? 0)) return;
-		setDiceCounts((counts) =>
-			counts.map((c, i) => (i === face - 1 ? c + 1 : c)),
-		);
+		if (perFaceCap !== undefined && diceCounts[face - 1] >= perFaceCap) return;
+		if (maxDistinctFaces !== undefined && diceCounts[face - 1] === 0) {
+			const distinctFacesUsed = diceCounts.filter((c) => c > 0).length;
+			if (distinctFacesUsed >= maxDistinctFaces) return;
+		}
+		setDiceEntries((entries) => [...entries, face]);
 	}
 
 	function decrementFace(face: number) {
-		setDiceCounts((counts) =>
-			counts.map((c, i) => (i === face - 1 && c > 0 ? c - 1 : c)),
-		);
+		setDiceEntries((entries) => {
+			let idx = -1;
+			for (let i = entries.length - 1; i >= 0; i--) {
+				if (entries[i] === face) {
+					idx = i;
+					break;
+				}
+			}
+			if (idx === -1) return entries;
+			return [...entries.slice(0, idx), ...entries.slice(idx + 1)];
+		});
 	}
 
 	const preview = trpc.session.previewScores.useQuery(
@@ -164,7 +217,7 @@ export default function Host() {
 		onSuccess: () => closePanel(),
 	});
 
-	function submit(value: number) {
+	function submit(value: number, dice?: number[]) {
 		if (!selected || !hostToken) return;
 		submitScore.mutate({
 			sessionCode,
@@ -172,12 +225,13 @@ export default function Host() {
 			playerId: selected.playerId,
 			categoryId: selected.categoryId,
 			value,
+			dice,
 		});
 	}
 
 	function handleSubmit() {
 		if (previewValue !== undefined) {
-			submit(previewValue);
+			submit(previewValue, diceEntries);
 		}
 	}
 
@@ -283,17 +337,12 @@ export default function Host() {
 
 			<Card withBorder radius="md" p="lg" w="100%">
 				<Group justify="space-between" wrap="nowrap" align="center">
-					<div>
-						<Text size="sm" fw={500}>
-							{t("host.invitePlayers")}
+					<Text c="dimmed" size="sm">
+						{t("shared.sessionCode")}{" "}
+						<Text span fw={700} ff="monospace">
+							{sessionCode}
 						</Text>
-						<Text c="dimmed" size="sm">
-							{t("shared.sessionCode")}{" "}
-							<Text span fw={700} ff="monospace">
-								{sessionCode}
-							</Text>
-						</Text>
-					</div>
+					</Text>
 					<Group gap="xs" wrap="nowrap">
 						{!rosterLocked && (
 							<Popover
@@ -361,6 +410,15 @@ export default function Host() {
 							</Text>
 						)}
 					</Stack>
+
+					{selected &&
+						currentPlayerId &&
+						selected.playerId !== currentPlayerId &&
+						currentPlayerName && (
+							<Text size="sm" fs="italic" ta="center" mt="sm">
+								{t("host.offTurnWarning", { player: currentPlayerName })}
+							</Text>
+						)}
 
 					<Group justify="center" gap="sm" wrap="wrap" mih={44} mt="sm" mb="md">
 						{selectedFixedValue !== undefined ? (
@@ -455,7 +513,15 @@ export default function Host() {
 											variant="outline"
 											color="gray"
 											onClick={() => incrementFace(face)}
-											disabled={diceTotal >= (diceCapacity ?? 0)}
+											disabled={
+												diceTotal >= (diceCapacity ?? 0) ||
+												(perFaceCap !== undefined &&
+													diceCounts[face - 1] >= perFaceCap) ||
+												(maxDistinctFaces !== undefined &&
+													diceCounts[face - 1] === 0 &&
+													diceCounts.filter((c) => c > 0).length >=
+														maxDistinctFaces)
+											}
 										>
 											+
 										</ActionIcon>
