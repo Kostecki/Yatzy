@@ -63,7 +63,6 @@ export const sessions = sqliteTable("sessions", {
 	gameModeId: text("game_mode_id")
 		.references(() => gameModes.id, { onDelete: "cascade" })
 		.notNull(),
-	hostTokenHash: text("host_token_hash").notNull(),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 	finishedAt: integer("finished_at", { mode: "timestamp" }),
 });
@@ -114,4 +113,16 @@ export const scores = sqliteTable(
 	(t) => ({
 		pk: primaryKey({ columns: [t.sessionCode, t.playerId, t.categoryId] }),
 	}),
+);
+
+export const hostTokens = sqliteTable(
+	"host_tokens",
+	{
+		sessionCode: text("session_code")
+			.references(() => sessions.sessionCode, { onDelete: "cascade" })
+			.notNull(),
+		tokenHash: text("token_hash").notNull(),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	},
+	(t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.tokenHash] }) }),
 );

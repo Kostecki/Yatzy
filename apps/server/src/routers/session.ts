@@ -1,13 +1,14 @@
 import crypto from "node:crypto";
 import { on } from "node:events";
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { client } from "../db/db-client.js";
 import {
 	categories,
 	gameModeCategories,
+	hostTokens,
 	players,
 	scores,
 	sessionCategories,
@@ -29,6 +30,7 @@ function generateSessionCode(length = 6): string {
 	return code;
 }
 
+// Generate a unique session code by checking against existing session codes in the database
 function generateUniqueSessionCode(): string {
 	const maxAttempts = 20;
 
@@ -116,13 +118,18 @@ function getFullSessionState(sessionCode: string) {
 export const hostProcedure = publicProcedure
 	.input(z.object({ sessionCode: z.string(), hostToken: z.string() }))
 	.use(({ input, next }) => {
-		const session = client
-			.select({ hostTokenHash: sessions.hostTokenHash })
-			.from(sessions)
-			.where(eq(sessions.sessionCode, input.sessionCode))
+		const match = client
+			.select({ tokenHash: hostTokens.tokenHash })
+			.from(hostTokens)
+			.where(
+				and(
+					eq(hostTokens.sessionCode, input.sessionCode),
+					eq(hostTokens.tokenHash, hashToken(input.hostToken)),
+				),
+			)
 			.get();
 
-		if (!session || hashToken(input.hostToken) !== session.hostTokenHash) {
+		if (!match) {
 			throw new TRPCError({
 				code: "UNAUTHORIZED",
 				message:
@@ -153,7 +160,14 @@ export const sessionRouter = router({
 					.values({
 						sessionCode,
 						gameModeId,
-						hostTokenHash,
+						createdAt: new Date(),
+					})
+					.run();
+
+				tx.insert(hostTokens)
+					.values({
+						sessionCode,
+						tokenHash: hostTokenHash,
 						createdAt: new Date(),
 					})
 					.run();
@@ -316,4 +330,76 @@ export const sessionRouter = router({
 
 		broadcastSessionUpdate(sessionCode);
 	}),
+
+	listFinished: publicProcedure.query(async () => {
+		const finishedSessions = client
+			.select({
+				sessionCode: sessions.sessionCode,
+				gameModeId: sessions.gameModeId,
+				createdAt: sessions.createdAt,
+				finishedAt: sessions.finishedAt,
+			})
+			.from(sessions)
+			.where(isNotNull(sessions.finishedAt))
+			.orderBy(desc(sessions.finishedAt))
+			.all();
+
+		return finishedSessions.map((session) => {
+			const sessionPlayers = client
+				.select()
+				.from(players)
+				.where(eq(players.sessionCode, session.sessionCode))
+				.orderBy(players.orderIndex)
+				.all();
+
+			const sessionCategoryList = client
+				.select({ id: categories.id, section: categories.section })
+				.from(sessionCategories)
+				.innerJoin(categories, eq(sessionCategories.categoryId, categories.id))
+				.where(eq(sessionCategories.sessionCode, session.sessionCode))
+				.all();
+
+			const sessionScores = client
+				.select()
+				.from(scores)
+				.where(eq(scores.sessionCode, session.sessionCode))
+				.all();
+
+			return {
+				...session,
+				players: sessionPlayers,
+				categories: sessionCategoryList,
+				scores: sessionScores,
+			};
+		});
+	}),
+
+	claimHost: publicProcedure
+		.input(z.object({ sessionCode: z.string() }))
+		.mutation(async ({ input: { sessionCode } }) => {
+			const session = client
+				.select({ sessionCode: sessions.sessionCode })
+				.from(sessions)
+				.where(eq(sessions.sessionCode, sessionCode))
+				.get();
+
+			if (!session) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Session not found",
+				});
+			}
+
+			const hostToken = crypto.randomUUID();
+			client
+				.insert(hostTokens)
+				.values({
+					sessionCode,
+					tokenHash: hashToken(hostToken),
+					createdAt: new Date(),
+				})
+				.run();
+
+			return { hostToken };
+		}),
 });
