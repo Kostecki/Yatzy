@@ -32,7 +32,10 @@ FROM node:26-alpine AS runtime
 # bare alpine image doesn't ship (only the build stage's g++ install pulls
 # it in) — without this it fails at require() time, not build time.
 RUN apk add --no-cache libstdc++
-RUN addgroup -S app && adduser -S app -G app
+# Use the image's built-in "node" user (fixed uid/gid 1000:1000) instead of
+# creating our own — it's a stable, well-known id, which matters for bind
+# mounts (e.g. Komodo) where the host-side directory's ownership has to be
+# set to match it manually; a self-rolled user's uid isn't guaranteed/documented.
 
 WORKDIR /app
 COPY --from=prod-deps /prod/server/node_modules ./node_modules
@@ -42,11 +45,12 @@ COPY --from=build /app/apps/web/dist ./public
 
 # Named volumes are created root-owned; pre-creating /data here and
 # chowning it lets Docker carry that ownership onto the volume the first
-# time it's populated, so the non-root "app" user can write the SQLite
-# file into it.
-RUN mkdir -p /data && chown -R app:app /data
+# time it's populated, so the non-root "node" user can write the SQLite
+# file into it. For a bind mount instead, the host-side directory needs to
+# be chowned to 1000:1000 directly (see deploy notes).
+RUN mkdir -p /data && chown -R node:node /data
 
-USER app
+USER node
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
