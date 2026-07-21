@@ -21,7 +21,7 @@ export const common: CommonMessages = {
 		historySubheading: "Se resultaterne for tidligere spil", // "View the results of previous games"
 		joinCodePlaceholder: "Pinkode", // "Session code"
 		joinHeading: "Deltag i spil", // "Join a game"
-		joinSubheading: "Har du allerede en pinkode?", // "Already have a session code?"
+		joinSubheading: "Indtast din pinkode og deltag i spillet", // "Enter your session code to join the game"
 		joinSubmit: "Deltag", // "Join"
 		playerCount_one: "{{count}} spiller", // "{{count}} player"
 		playerCount_other: "{{count}} spillere", // "{{count}} players"

@@ -20,7 +20,7 @@ export const common: CommonMessages = {
 		historySubheading: "View the results of previous games",
 		joinCodePlaceholder: "Session code",
 		joinHeading: "Join a game",
-		joinSubheading: "Already have a session code?",
+		joinSubheading: "Enter your session code to join the game",
 		joinSubmit: "Join",
 		playerCount_one: "{{count}} player",
 		playerCount_other: "{{count}} players",
