@@ -276,6 +276,8 @@ export default function CreateGame() {
 		},
 	});
 
+	const hasAnyPlayers = players.some((p) => p.name.trim() !== "");
+
 	const finishedGames = trpc.session.listFinished.useQuery();
 	const historyTotalPages = Math.ceil(
 		(finishedGames.data?.length ?? 0) / HISTORY_PAGE_SIZE,
@@ -420,7 +422,9 @@ export default function CreateGame() {
 					<Button
 						fullWidth
 						onClick={handleSubmit}
-						disabled={!selectedModeId || createSession.isPending}
+						disabled={
+							!selectedModeId || createSession.isPending || !hasAnyPlayers
+						}
 						loading={createSession.isPending}
 					>
 						{t("createGame.submit")}
