@@ -1,3 +1,5 @@
+import { Box } from "@mantine/core";
+
 const PIP_LAYOUTS: Record<number, [number, number][]> = {
 	1: [[1, 1]],
 	2: [
@@ -44,7 +46,7 @@ export function DieFace({
 	const pips = PIP_LAYOUTS[value] ?? [];
 
 	return (
-		<div
+		<Box
 			style={{
 				width: size,
 				height: size,
@@ -68,7 +70,7 @@ export function DieFace({
 				const col = i % 3;
 				const isPip = pips.some(([r, c]) => r === row && c === col);
 				return (
-					<div
+					<Box
 						key={`${row}-${col}`}
 						style={{
 							display: "flex",
@@ -77,7 +79,7 @@ export function DieFace({
 						}}
 					>
 						{isPip && (
-							<div
+							<Box
 								style={{
 									width: size * 0.16,
 									height: size * 0.16,
@@ -88,9 +90,9 @@ export function DieFace({
 								}}
 							/>
 						)}
-					</div>
+					</Box>
 				);
 			})}
-		</div>
+		</Box>
 	);
 }

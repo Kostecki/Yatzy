@@ -1,4 +1,4 @@
-import { ActionIcon, Popover, Stack, Text } from "@mantine/core";
+import { ActionIcon, Box, Popover, Stack, Text } from "@mantine/core";
 import { IconQrcode } from "@tabler/icons-react";
 import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
@@ -29,7 +29,7 @@ export function InviteQr({
 			</Popover.Target>
 			<Popover.Dropdown>
 				<Stack align="center" gap="xs">
-					<div
+					<Box
 						style={{
 							background: "white",
 							padding: 12,
@@ -38,7 +38,7 @@ export function InviteQr({
 						}}
 					>
 						<QRCode value={joinUrl} size={160} />
-					</div>
+					</Box>
 					<Text size="xs" c="dimmed" ta="center" maw={160}>
 						{t("inviteQr.instructions", { host: location.host })}
 					</Text>

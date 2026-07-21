@@ -1,4 +1,13 @@
-import { Button, Card, Group, Loader, Stack, Text, Title } from "@mantine/core";
+import {
+	Box,
+	Button,
+	Card,
+	Group,
+	Loader,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
@@ -43,7 +52,7 @@ export default function View() {
 			<Card withBorder radius="md" p="lg" w="100%">
 				<Stack gap="lg">
 					<Group justify="space-between" wrap="nowrap" align="center">
-						<div>
+						<Box>
 							<Title order={3}>{t("view.whoAreYou")}</Title>
 							<Text c="dimmed" size="sm">
 								{t("shared.sessionCode")}{" "}
@@ -51,7 +60,7 @@ export default function View() {
 									{sessionCode}
 								</Text>
 							</Text>
-						</div>
+						</Box>
 						<InviteQr sessionCode={sessionCode} />
 					</Group>
 
