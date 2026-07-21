@@ -22,7 +22,7 @@ const createGameRoute = createRoute({
 
 const hostRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/s/$code/host",
+	path: "/s/$code/game",
 	component: Host,
 });
 

@@ -31,7 +31,7 @@ import {
 	upperBonusPace,
 } from "$lib/scoring";
 
-const route = getRouteApi("/s/$code/host");
+const route = getRouteApi("/s/$code/game");
 
 export default function Host() {
 	const { t } = useTranslation();
