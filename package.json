@@ -4,20 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently -n server,web -c green,blue \"pnpm --filter server dev\" \"pnpm --filter web dev\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "11.13.1",
-      "onFail": "download"
-    }
-  },
   "type": "module",
   "devDependencies": {
-    "@biomejs/biome": "^2.5.5"
+    "@biomejs/biome": "^2.5.5",
+    "concurrently": "^10.0.3"
+  },
+  "volta": {
+    "node": "26.3.0",
+    "pnpm": "11.13.1"
   }
 }
