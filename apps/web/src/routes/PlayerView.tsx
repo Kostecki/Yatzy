@@ -1,4 +1,12 @@
-import { Button, Loader, Popover, Stack, Text, Title } from "@mantine/core";
+import {
+	Button,
+	Loader,
+	Popover,
+	Progress,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -41,7 +49,7 @@ export default function PlayerView() {
 		return <Loader size="sm" color="gray" />;
 	}
 
-	const { currentRound, totalRounds, currentPlayerId } =
+	const { currentRound, totalRounds, currentPlayerId, isComplete } =
 		roundProgress(sessionState);
 	const isMyTurn = currentPlayerId === playerId;
 	const currentPlayerName = sessionState.players.find(
@@ -58,13 +66,25 @@ export default function PlayerView() {
 					{gameMode && tc(`gameModes.${gameMode.id}.description`)}
 				</Text>
 			</Stack>
-			<Text c="dimmed" size="sm">
-				{t("shared.roundStatus", { round: currentRound, total: totalRounds })}
-				{isMyTurn
-					? ` — ${t("playerView.yourTurn")}`
-					: currentPlayerName &&
-						` — ${t("playerView.waitingFor", { player: currentPlayerName })}`}
-			</Text>
+			<Stack gap={4}>
+				<Text c="dimmed" size="sm">
+					{t("shared.roundStatus", { round: currentRound, total: totalRounds })}
+					{isMyTurn
+						? ` - ${t("playerView.yourTurn")}`
+						: currentPlayerName &&
+							` - ${t("playerView.waitingFor", { player: currentPlayerName })}`}
+				</Text>
+				{!isComplete && (
+					<Progress
+						value={isComplete ? 100 : ((currentRound - 1) / totalRounds) * 100}
+						transitionDuration={200}
+						size="xs"
+						radius="xl"
+						w="100%"
+						mb="sm"
+					/>
+				)}
+			</Stack>
 
 			<ScoreTable
 				sessionState={sessionState}

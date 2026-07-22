@@ -7,6 +7,7 @@ import {
 	Loader,
 	Modal,
 	Popover,
+	Progress,
 	SimpleGrid,
 	Stack,
 	Text,
@@ -304,12 +305,26 @@ export default function Host() {
 					{gameMode && tc(`gameModes.${gameMode.id}.description`)}
 				</Text>
 			</Stack>
-			<Stack align="center" gap={8}>
+			<Stack align="center" gap={8} w="100%" maw="25ch">
 				<Text c="dimmed" size="sm">
 					{t("shared.roundStatus", { round: currentRound, total: totalRounds })}
 					{currentPlayerName &&
-						` — ${t("host.turn", { player: currentPlayerName })}`}
+						` - ${t("host.turn", { player: currentPlayerName })}`}
 				</Text>
+				{!isComplete && (
+					<Progress
+						value={
+							(sessionState.scores.length /
+								(sessionState.players.length * totalRounds)) *
+							100
+						}
+						transitionDuration={200}
+						size="xs"
+						radius="xl"
+						w="100%"
+						mb="sm"
+					/>
+				)}
 				{sessionState.session.finishedAt ? (
 					<Text size="sm" fw={600} c="green">
 						{t("host.gameFinished")}
