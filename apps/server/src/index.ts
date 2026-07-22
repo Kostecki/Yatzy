@@ -77,6 +77,14 @@ if (existsSync(publicDir)) {
 	});
 }
 
+// Chrome DevTools probes this path on every load; return an empty response instead of a 404.
+fastify.get(
+	"/.well-known/appspecific/com.chrome.devtools.json",
+	async (_request, reply) => {
+		reply.code(204).send();
+	},
+);
+
 fastify.listen({ host: HOST, port: PORT }, (err) => {
 	if (err) {
 		fastify.log.error(err);
