@@ -236,15 +236,15 @@ export default function Stats() {
 					value={`${
 						overallBonusRate
 							? `${Math.round(overallBonusRate.rate * 100)}%`
-							: "—"
-					} · ${yatzy.attempts > 0 ? `${Math.round(yatzy.rate * 100)}%` : "—"}`}
+							: "-"
+					} · ${yatzy.attempts > 0 ? `${Math.round(yatzy.rate * 100)}%` : "-"}`}
 				/>
 				<StatTile
 					label={t("stats.overviewHighestScore")}
 					value={
 						extremes.highest
 							? `${extremes.highest.total} (${extremes.highest.playerName})`
-							: "—"
+							: "-"
 					}
 				/>
 				<StatTile
@@ -252,7 +252,7 @@ export default function Stats() {
 					value={
 						extremes.lowest
 							? `${extremes.lowest.total} (${extremes.lowest.playerName})`
-							: "—"
+							: "-"
 					}
 				/>
 				<StatTile
@@ -260,7 +260,7 @@ export default function Stats() {
 					value={
 						summary.avgDurationMs !== undefined
 							? formatDuration(summary.avgDurationMs)
-							: "—"
+							: "-"
 					}
 				/>
 				<StatTile
@@ -268,7 +268,7 @@ export default function Stats() {
 					value={
 						summary.longestDurationMs !== undefined
 							? formatDuration(summary.longestDurationMs)
-							: "—"
+							: "-"
 					}
 				/>
 				<StatTile
@@ -276,7 +276,7 @@ export default function Stats() {
 					value={
 						summary.shortestDurationMs !== undefined
 							? formatDuration(summary.shortestDurationMs)
-							: "—"
+							: "-"
 					}
 				/>
 				<StatTile
@@ -284,7 +284,7 @@ export default function Stats() {
 					value={
 						summary.totalDurationMs !== undefined
 							? formatDuration(summary.totalDurationMs)
-							: "—"
+							: "-"
 					}
 				/>
 			</SimpleGrid>
