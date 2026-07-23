@@ -14,7 +14,13 @@ See [PLAN.md](PLAN.md) for the full design/architecture writeup.
 
 ## Local development
 
-Requires Node 26 and pnpm 11.13.1 (see `devEngines` in the root `package.json`).
+This repo pins its toolchain with [Volta](https://volta.sh) (see the `volta` field in the root `package.json`) — install it once and it automatically switches to the right Node (26.3.0) and pnpm (11.13.1) versions whenever you're in this directory, no manual version management needed:
+
+```sh
+curl https://get.volta.sh | bash
+```
+
+Without Volta, just make sure Node 26.3.0 and pnpm 11.13.1 (or compatible) are on your `PATH` yourself.
 
 ```sh
 pnpm install
@@ -24,6 +30,9 @@ cp apps/server/.env.example apps/server/.env
 
 pnpm --filter server dev   # Fastify + tRPC on :3000
 pnpm --filter web dev      # Vite dev server
+
+# Run both "server" and "web" concurrently - from project root
+pnpm dev                   
 ```
 
 Other useful commands:
