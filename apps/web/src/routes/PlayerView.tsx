@@ -8,7 +8,8 @@ import {
 	Title,
 } from "@mantine/core";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import confetti from "canvas-confetti";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { trpc } from "$lib/api/trpc";
@@ -26,6 +27,49 @@ export default function PlayerView() {
 	const { code: sessionCode, playerId } = route.useParams();
 	const { sessionState, subscriptionError, gameMode } =
 		useSessionState(sessionCode);
+
+	// Personal celebration for this player's own hard-to-get moments - a
+	// Yatzy or clearing the upper bonus. Tracked as a false->true transition
+	// (mirroring the game-finished confetti in Host.tsx) rather than diffing
+	// individual scores, since both conditions can only become true once and
+	// never revert, so a plain boolean flip is all "did I just hit this?" needs.
+	const hadYatzy = useRef<boolean | undefined>(undefined);
+	const hadBonus = useRef<boolean | undefined>(undefined);
+	useEffect(() => {
+		if (!sessionState) return;
+
+		const myScores = sessionState.scores.filter((s) => s.playerId === playerId);
+		const categoriesById = new Map(
+			sessionState.categories.map((c) => [c.id, c]),
+		);
+
+		const yatzyHit = myScores.some(
+			(score) =>
+				categoriesById.get(score.categoryId)?.primitive === "yatzy" &&
+				!!score.value,
+		);
+
+		const upperCategoryIds = new Set(
+			sessionState.categories
+				.filter((c) => c.section === "upper")
+				.map((c) => c.id),
+		);
+		const upperSubtotal = myScores
+			.filter((s) => upperCategoryIds.has(s.categoryId))
+			.reduce((sum, s) => sum + (s.value ?? 0), 0);
+		const bonusHit =
+			gameMode !== undefined && upperSubtotal >= gameMode.upperBonusThreshold;
+
+		if (hadYatzy.current === false && yatzyHit) {
+			confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+		}
+		if (hadBonus.current === false && bonusHit) {
+			confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+		}
+
+		hadYatzy.current = yatzyHit;
+		hadBonus.current = bonusHit;
+	}, [sessionState, playerId, gameMode]);
 
 	const navigate = useNavigate();
 	const [claimOpened, setClaimOpened] = useState(false);

@@ -10,13 +10,13 @@ import {
 	TextInput,
 	UnstyledButton,
 } from "@mantine/core";
-import { IconEye, IconEyeOff, IconPlus } from "@tabler/icons-react";
+import { IconEye, IconEyeOff, IconPlus, IconTrophy } from "@tabler/icons-react";
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { GameMode, SessionState } from "$lib/api/useSessionState";
 import { DieFace } from "$lib/components/DieFace";
-import { exampleDiceGroups, fixedValue } from "$lib/scoring";
+import { exampleDiceGroups, fixedValue, rankPlayers } from "$lib/scoring";
 
 type Category = SessionState["categories"][number];
 
@@ -121,12 +121,14 @@ function CategoryLabel({
 function PlayerNameHeader({
 	player,
 	isCurrent,
+	isWinner,
 	onRename,
 	onRemove,
 	removeDisabled,
 }: {
 	player: { id: string; name: string };
 	isCurrent: boolean;
+	isWinner?: boolean;
 	onRename?: (name: string) => void;
 	onRemove?: () => void;
 	removeDisabled: boolean;
@@ -136,9 +138,25 @@ function PlayerNameHeader({
 	const [name, setName] = useState(player.name);
 
 	const label = (
-		<Text span fw={700} c={isCurrent ? "green.8" : undefined}>
-			{player.name}
-		</Text>
+		<Group gap={4} justify="center" wrap="nowrap">
+			{isWinner && (
+				<IconTrophy
+					size={14}
+					color="var(--mantine-color-yellow-6)"
+					style={{ display: "block", transform: "translateY(-1px)" }}
+				/>
+			)}
+			<Text span fw={700} c={isCurrent ? "green.8" : undefined}>
+				{player.name}
+			</Text>
+			{isWinner && (
+				<IconTrophy
+					size={14}
+					color="var(--mantine-color-yellow-6)"
+					style={{ display: "block", transform: "translateY(-1px)" }}
+				/>
+			)}
+		</Group>
 	);
 
 	if (!onRename) {
@@ -227,6 +245,13 @@ export function ScoreTable({
 	const isFinished = Boolean(sessionState.session.finishedAt);
 	const canToggleTotals = Boolean(onCellClick) && !isFinished;
 	const totalsHidden = canToggleTotals && !totalsRevealed;
+	const winnerIds = isFinished
+		? new Set(
+				rankPlayers(sessionState, gameMode)
+					.filter((p) => p.rank === 1)
+					.map((p) => p.id),
+			)
+		: new Set<string>();
 
 	const players = onlyPlayerId
 		? sessionState.players.filter((p) => p.id === onlyPlayerId)
@@ -364,6 +389,7 @@ export function ScoreTable({
 							<PlayerNameHeader
 								player={player}
 								isCurrent={player.id === currentPlayerId}
+								isWinner={winnerIds.has(player.id)}
 								onRename={
 									onRenamePlayer
 										? (name) => onRenamePlayer(player.id, name)
