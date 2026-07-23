@@ -69,6 +69,12 @@ export interface CommonMessages {
 	view: {
 		whoAreYou: string;
 	};
+	standings: {
+		diceDistribution: string;
+		diceDistributionSubheading: string;
+		diceDistributionSeriesLabel: string;
+		diceDistributionAxisLabel: string;
+	};
 	scoreTable: {
 		bonus: string;
 		category: string;
@@ -82,6 +88,56 @@ export interface CommonMessages {
 	inviteQr: {
 		instructions: string;
 		showQr: string;
+	};
+	stats: {
+		heading: string;
+		subheading: string;
+		noData: string;
+		noDataForMode: string;
+		allModes: string;
+		navLabel: string;
+		overviewGames: string;
+		overviewRolls: string;
+		overviewBonusYatzyRate: string;
+		overviewAvgDuration: string;
+		overviewHighestScore: string;
+		overviewLowestScore: string;
+		overviewLongestGame: string;
+		overviewShortestGame: string;
+		overviewTotalPlaytime: string;
+		diceFrequencyHeading: string;
+		diceFrequencySubheading: string;
+		diceFrequencySeriesLabel: string;
+		diceFrequencyAxisLabel: string;
+		scoreDistributionHeading: string;
+		scoreDistributionSubheading: string;
+		scoreDistributionSeriesLabel: string;
+		scoreDistributionAxisLabel: string;
+		categoryStatsHeading: string;
+		categoryStatsSubheading: string;
+		categoryColumn: string;
+		attemptsColumn: string;
+		averageColumn: string;
+		scratchRateColumn: string;
+		maxColumn: string;
+		leaderboardHeading: string;
+		leaderboardSubheading: string;
+		playerColumn: string;
+		gamesColumn: string;
+		winsColumn: string;
+		winRateColumn: string;
+		avgTotalColumn: string;
+		bestTotalColumn: string;
+		turnOrderHeading: string;
+		turnOrderSubheading: string;
+		turnColumn: string;
+		avgRankColumn: string;
+		radarHeading: string;
+		radarSubheading: string;
+		gamesOverTimeHeading: string;
+		gamesOverTimeSubheading: string;
+		gamesOverTimeSeriesLabel: string;
+		tableViewToggle: string;
 	};
 }
 

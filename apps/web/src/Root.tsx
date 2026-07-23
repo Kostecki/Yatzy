@@ -1,12 +1,12 @@
-import { ActionIcon, Flex, SegmentedControl } from "@mantine/core";
-import { IconHome } from "@tabler/icons-react";
+import { ActionIcon, Flex, Group, SegmentedControl } from "@mantine/core";
+import { IconChartBar, IconHome } from "@tabler/icons-react";
 import { Link, Outlet } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 import { type Locale, setLocale } from "./lib/i18n";
 
 export default function Root() {
-	const { i18n } = useTranslation();
+	const { t, i18n } = useTranslation();
 
 	return (
 		<Flex
@@ -18,18 +18,27 @@ export default function Root() {
 			p="md"
 			pb={120}
 		>
-			<ActionIcon
-				component={Link}
-				to="/"
-				variant="outline"
-				color="gray.4"
-				size="md"
-				pos="fixed"
-				top={16}
-				left={16}
-			>
-				<IconHome size={16} />
-			</ActionIcon>
+			<Group pos="fixed" top={16} left={16} gap="xs">
+				<ActionIcon
+					component={Link}
+					to="/"
+					variant="outline"
+					color="gray.4"
+					size="md"
+				>
+					<IconHome size={16} />
+				</ActionIcon>
+				<ActionIcon
+					component={Link}
+					to="/stats"
+					variant="outline"
+					color="gray.4"
+					size="md"
+					aria-label={t("stats.navLabel")}
+				>
+					<IconChartBar size={16} />
+				</ActionIcon>
+			</Group>
 			<SegmentedControl
 				pos="fixed"
 				top={16}

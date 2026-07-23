@@ -57,6 +57,13 @@ export const common: CommonMessages = {
 	view: {
 		whoAreYou: "Hvem er du?", // "Who are you?"
 	},
+	standings: {
+		diceDistribution: "Terningfordeling", // "Dice distribution"
+		diceDistributionSubheading:
+			"Hvor ofte hvert øje-antal er kommet op i de terninger, der blev brugt til at score dette spil", // "How often each face came up in the dice used to score this game"
+		diceDistributionSeriesLabel: "Gange vist", // "Times shown"
+		diceDistributionAxisLabel: "Øjne", // "Face"
+	},
 	scoreTable: {
 		bonus: "Bonus", // "Bonus"
 		category: "Kategori", // "Category"
@@ -71,5 +78,60 @@ export const common: CommonMessages = {
 		instructions:
 			"Scan for at deltage, eller gå til {{host}} og indtast koden.", // "Scan to join, or go to {{host}} and enter the code."
 		showQr: "Vis QR-kode", // "Show invite QR code"
+	},
+	stats: {
+		heading: "Statistik & tendenser", // "Stats & Trends"
+		subheading: "Sjove tal fra alle afsluttede spil", // "Fun numbers gatherede from every finished game"
+		noData:
+			"Ingen afsluttede spil endnu — statistikken vises her, når et par spil er færdige.", // "No finished games yet — stats will show up here once a game or two wraps up."
+		noDataForMode: "Ingen afsluttede spil for denne spiltype endnu.", // "No finished games for this mode yet."
+		allModes: "Alle spiltyper", // "All modes"
+		navLabel: "Statistik", // "Stats"
+		overviewGames: "Spillede spil", // "Games played"
+		overviewRolls: "Registrerede terningresultater", // "Dice results recorded"
+		overviewBonusYatzyRate: "Bonus- & Yatzy-rate", // "Bonus & Yatzy rate"
+		overviewAvgDuration: "Gns. spilletid", // "Avg. game length"
+		overviewHighestScore: "Højeste score", // "Highest score"
+		overviewLowestScore: "Laveste score", // "Lowest score"
+		overviewLongestGame: "Længste spil", // "Longest game"
+		overviewShortestGame: "Korteste spil", // "Shortest game"
+		overviewTotalPlaytime: "Samlet spilletid", // "Total playtime"
+		diceFrequencyHeading: "Terningfordeling", // "Dice distribution"
+		diceFrequencySubheading:
+			"Hvor ofte hvert øje-antal er kommet op i de terninger, der blev scoret med", // "How often each face has come up in the dice each category was scored with"
+		diceFrequencySeriesLabel: "Gange vist", // "Times shown"
+		diceFrequencyAxisLabel: "Øjne", // "Face"
+		scoreDistributionHeading: "Scorefordeling", // "Score distribution"
+		scoreDistributionSubheading:
+			"Alle spilleres endelige total, på tværs af alle afsluttede spil", // "Every player's final total, across all finished games"
+		scoreDistributionSeriesLabel: "Spillerresultater", // "Player games"
+		scoreDistributionAxisLabel: "Samlet score", // "Total score"
+		categoryStatsHeading: "Kategorisværhedsgrad", // "Category difficulty"
+		categoryStatsSubheading: "Gennemsnitlig score og stregrate pr. kategori", // "Average score and scratch rate per category"
+		categoryColumn: "Kategori", // "Category"
+		attemptsColumn: "Forsøg", // "Attempts"
+		averageColumn: "Gennemsnit", // "Average"
+		scratchRateColumn: "Stregrate", // "Scratch rate"
+		maxColumn: "Bedste", // "Best"
+		leaderboardHeading: "Resultattavle", // "Leaderboard"
+		leaderboardSubheading: "Rangeret efter gennemsnitlig total", // "Ranked by average total score"
+		playerColumn: "Spiller", // "Player"
+		gamesColumn: "Spil", // "Games"
+		winsColumn: "Sejre", // "Wins"
+		winRateColumn: "Sejrsrate", // "Win rate"
+		avgTotalColumn: "Gns. total", // "Avg. total"
+		bestTotalColumn: "Bedste total", // "Best total"
+		turnOrderHeading: "Rækkefølgens betydning", // "Turn order advantage"
+		turnOrderSubheading:
+			"Sejrsrate og gennemsnitlig placering ud fra tur-rækkefølgen", // "Win rate and average finishing rank by seat position"
+		turnColumn: "Tur", // "Turn"
+		avgRankColumn: "Gns. placering", // "Avg. rank"
+		radarHeading: "Spillestil-sammenligning", // "Playstyle comparison"
+		radarSubheading:
+			"Gennemsnitlig score pr. kategori — jo mørkere, jo stærkere i forhold til de andre spillere i rækken", // "Average score per category — darker means stronger relative to the other players in that row"
+		gamesOverTimeHeading: "Spil over tid", // "Games over time"
+		gamesOverTimeSubheading: "Afsluttede spil pr. dag", // "Finished games per day"
+		gamesOverTimeSeriesLabel: "Afsluttede spil", // "Games finished"
+		tableViewToggle: "Tabelvisning", // "Table view"
 	},
 };

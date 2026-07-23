@@ -8,6 +8,7 @@ import Root from "./Root";
 import CreateGame from "./routes/CreateGame";
 import Host from "./routes/Host";
 import PlayerView from "./routes/PlayerView";
+import Stats from "./routes/Stats";
 import View from "./routes/View";
 
 const rootRoute = createRootRoute({
@@ -38,11 +39,18 @@ const playerViewRoute = createRoute({
 	component: PlayerView,
 });
 
+const statsRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/stats",
+	component: Stats,
+});
+
 const routeTree = rootRoute.addChildren([
 	createGameRoute,
 	hostRoute,
 	viewRoute,
 	playerViewRoute,
+	statsRoute,
 ]);
 
 export const router = createRouter({ routeTree });
