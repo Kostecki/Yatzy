@@ -207,6 +207,7 @@ export function Standings({
 							</Text>
 							<BarChart
 								h={160}
+								mt="lg"
 								data={diceCounts.map(({ face, count }) => ({
 									face: String(face),
 									count,
