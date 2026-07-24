@@ -33,7 +33,7 @@ const MEDAL_COLOR: Record<number, string> = {
 const PODIUM_HEIGHT: Record<number, number> = {
 	1: 88,
 	2: 64,
-	3: 48,
+	3: 64,
 };
 
 // Visual left-to-right podium order (2nd, 1st, 3rd), applied via CSS `order`
@@ -49,28 +49,16 @@ interface PodiumGroup {
 	players: RankedPlayer[];
 }
 
-// A corner is square only where this pedestal touches a neighbor at least as
-// tall as itself (so the top edges actually meet flush); a taller pedestal's
-// corner stays exposed above a shorter neighbor and should stay rounded
-// regardless of position - gold is always taller than its neighbors, so it
-// always gets both corners rounded, not because it's "the middle one".
-function pedestalRadius(rank: number, groups: PodiumGroup[]): string {
-	const visualOrder = [...groups].sort(
-		(a, b) => podiumOrder(a.rank) - podiumOrder(b.rank),
-	);
-	const index = visualOrder.findIndex((g) => g.rank === rank);
-	const height = PODIUM_HEIGHT[rank] ?? 40;
-	const leftHeight =
-		index > 0 ? (PODIUM_HEIGHT[visualOrder[index - 1].rank] ?? 40) : 0;
-	const rightHeight =
-		index < visualOrder.length - 1
-			? (PODIUM_HEIGHT[visualOrder[index + 1].rank] ?? 40)
-			: 0;
-
-	const left = leftHeight < height ? "6px" : "0";
-	const right = rightHeight < height ? "6px" : "0";
-	return `${left} ${right} 0 0`;
-}
+// The podium always has exactly 3 steps in this fixed visual order (silver,
+// gold, bronze), so the corner rounding per rank is constant rather than
+// depending on which ranks actually have a player - gold sits above both
+// neighbors and gets both corners rounded; silver and bronze each round only
+// the outer corner, since their inner corner meets gold's taller pedestal.
+const PEDESTAL_RADIUS: Record<number, string> = {
+	1: "6px 6px 0 0",
+	2: "6px 0 0 0",
+	3: "0 6px 0 0",
+};
 
 // Tied players share one pedestal, the way an actual podium works - two
 // golds stand together on the gold block rather than getting a pedestal
@@ -101,7 +89,16 @@ export function Standings({
 }) {
 	const { t } = useTranslation();
 	const ranked = rankPlayers(sessionState, gameMode);
-	const podium = groupPodiumByRank(ranked.filter((player) => player.rank <= 3));
+	const podiumGroups = groupPodiumByRank(
+		ranked.filter((player) => player.rank <= 3),
+	);
+	// Always render all 3 steps, even when the game has fewer than 3 players
+	// or ties leave a rank empty (e.g. two golds skip silver) - a slot with
+	// no group just shows an empty pedestal.
+	const podium = [1, 2, 3].map((rank) => ({
+		rank,
+		group: podiumGroups.find((g) => g.rank === rank),
+	}));
 	const rest = ranked.filter((player) => player.rank > 3);
 	const diceCounts = diceFaceCounts(sessionState.scores);
 	const hasDice = diceCounts.some(({ count }) => count > 0);
@@ -114,34 +111,36 @@ export function Standings({
 		<Card withBorder radius="md" p="lg" w="100%">
 			<Stack gap="xs">
 				<Group align="flex-end" justify="center" gap={0} wrap="nowrap">
-					{podium.map((group) => (
+					{podium.map(({ rank, group }) => (
 						<Stack
-							key={group.rank}
+							key={rank}
 							align="center"
-							gap={4}
+							gap={2}
 							style={{
 								flex: "1 1 0",
 								minWidth: 0,
-								order: podiumOrder(group.rank),
+								order: podiumOrder(rank),
 							}}
 						>
 							<Text fw={700} size="sm" ta="center" w="100%" truncate>
-								{group.players.map((player) => player.name).join(" · ")}
+								{group?.players.map((player) => player.name).join(" · ") ?? " "}
 							</Text>
-							<Text fw={700}>{group.players[0].total}</Text>
+							<Text c="gray.7" fw={600}>
+								{group?.players[0].total ?? " "}
+							</Text>
 							<Box
 								w="100%"
-								h={PODIUM_HEIGHT[group.rank] ?? 40}
-								bg={MEDAL_COLOR[group.rank] ?? "gray.4"}
+								h={PODIUM_HEIGHT[rank] ?? 40}
+								bg={MEDAL_COLOR[rank] ?? "gray.4"}
 								style={{
-									borderRadius: pedestalRadius(group.rank, podium),
+									borderRadius: PEDESTAL_RADIUS[rank] ?? "0",
 									display: "flex",
 									alignItems: "center",
 									justifyContent: "center",
 								}}
 							>
 								<Text fw={900} size="xl" c="white">
-									{group.rank}
+									{rank}
 								</Text>
 							</Box>
 						</Stack>
