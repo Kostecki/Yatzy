@@ -14,7 +14,6 @@ import {
 	sessionCategories,
 	sessions,
 } from "../db/schema.js";
-import { primitives } from "../scoring/primitives.js";
 import { publicProcedure, router } from "../trpc.js";
 import { broadcastSessionUpdate, sessionEvents } from "../ws-hub.js";
 
@@ -217,35 +216,6 @@ export const sessionRouter = router({
 			})) {
 				yield getFullSessionState(sessionCode);
 			}
-		}),
-
-	previewScores: publicProcedure
-		.input(
-			z.object({
-				sessionCode: z.string(),
-				diceCounts: z.array(z.number()).length(6),
-			}),
-		)
-		.query(async ({ input: { sessionCode, diceCounts } }) => {
-			const dice = diceCounts.flatMap((count, index) =>
-				Array(count).fill(index + 1),
-			);
-
-			const sessionCategoryList = client
-				.select({
-					id: categories.id,
-					primitive: categories.primitive,
-					params: categories.params,
-				})
-				.from(sessionCategories)
-				.innerJoin(categories, eq(sessionCategories.categoryId, categories.id))
-				.where(eq(sessionCategories.sessionCode, sessionCode))
-				.all();
-
-			return sessionCategoryList.map((category) => ({
-				categoryId: category.id,
-				value: primitives[category.primitive](dice, category.params as never),
-			}));
 		}),
 
 	submitScore: hostProcedure

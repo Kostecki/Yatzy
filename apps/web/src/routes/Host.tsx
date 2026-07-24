@@ -26,6 +26,7 @@ import { DieFace } from "$lib/components/DieFace";
 import { InviteQr } from "$lib/components/InviteQr";
 import { ScoreTable } from "$lib/components/ScoreTable";
 import { Standings } from "$lib/components/Standings";
+import { scoreCategory } from "$lib/primitives";
 import {
 	exampleDiceGroups,
 	fixedValue,
@@ -217,14 +218,10 @@ export default function Host() {
 		});
 	}
 
-	const preview = trpc.session.previewScores.useQuery(
-		{ sessionCode, diceCounts },
-		{ enabled: diceComplete },
-	);
-
-	const previewValue = preview.data?.find(
-		(p) => p.categoryId === selected?.categoryId,
-	)?.value;
+	const previewValue =
+		diceComplete && selectedCategory
+			? scoreCategory(selectedCategory, diceCounts)
+			: undefined;
 
 	const submitScore = trpc.session.submitScore.useMutation({
 		onSuccess: () => closePanel(),
@@ -584,11 +581,7 @@ export default function Host() {
 
 					{selectedFixedValue === undefined && (
 						<Text ta="center" size="lg" fw={600} mb="md">
-							{diceComplete && preview.isPending ? (
-								<Loader size="sm" color="gray" mx="auto" />
-							) : (
-								t("host.score", { value: previewValue ?? 0 })
-							)}
+							{t("host.score", { value: previewValue ?? 0 })}
 						</Text>
 					)}
 
