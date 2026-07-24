@@ -17,6 +17,7 @@ import { useSessionState } from "$lib/api/useSessionState";
 import { InviteQr } from "$lib/components/InviteQr";
 import { ScoreTable } from "$lib/components/ScoreTable";
 import { roundProgress } from "$lib/scoring";
+import { useWakeLock } from "$lib/useWakeLock";
 
 const route = getRouteApi("/s/$code/view/$playerId");
 
@@ -27,6 +28,9 @@ export default function PlayerView() {
 	const { code: sessionCode, playerId } = route.useParams();
 	const { sessionState, subscriptionError, gameMode } =
 		useSessionState(sessionCode);
+
+	// Prevent the device from sleeping while the player is viewing their game state.
+	useWakeLock();
 
 	// Personal celebration for this player's own hard-to-get moments - a
 	// Yatzy or clearing the upper bonus. Tracked as a false->true transition
