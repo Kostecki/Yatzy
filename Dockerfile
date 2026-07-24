@@ -12,6 +12,11 @@ RUN pnpm install --frozen-lockfile
 
 # ---- build: compile server (tsc) + web (vite) ----
 FROM deps AS build
+ARG VITE_GITHUB_REPO_LINK
+ARG VITE_LATEST_COMMIT_HASH
+ENV VITE_GITHUB_REPO_LINK=$VITE_GITHUB_REPO_LINK
+ENV VITE_LATEST_COMMIT_HASH=$VITE_LATEST_COMMIT_HASH
+
 COPY . .
 RUN pnpm --filter server build
 RUN pnpm --filter web build

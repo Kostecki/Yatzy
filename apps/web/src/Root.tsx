@@ -1,4 +1,10 @@
-import { ActionIcon, Flex, Group, SegmentedControl } from "@mantine/core";
+import {
+	ActionIcon,
+	Anchor,
+	Flex,
+	Group,
+	SegmentedControl,
+} from "@mantine/core";
 import { IconChartBar, IconHome } from "@tabler/icons-react";
 import { Link, Outlet } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -8,16 +14,12 @@ import { type Locale, setLocale } from "./lib/i18n";
 export default function Root() {
 	const { t, i18n } = useTranslation();
 
+	const githubRepoLink = import.meta.env.VITE_GITHUB_REPO_LINK;
+	const latestCommitHash = import.meta.env.VITE_LATEST_COMMIT_HASH.slice(0, 7);
+	const commitUrl = `${githubRepoLink}/commit/${latestCommitHash}`;
+
 	return (
-		<Flex
-			mih="100svh"
-			direction="column"
-			align="center"
-			justify="center"
-			gap="xl"
-			p="md"
-			pb={120}
-		>
+		<Flex mih="100svh" direction="column" gap="xl" px="md" pt="md" pb="sm">
 			<Group pos="fixed" top={16} left={16} gap="xs">
 				<ActionIcon
 					component={Link}
@@ -51,7 +53,26 @@ export default function Root() {
 					{ label: "🇬🇧", value: "en" },
 				]}
 			/>
-			<Outlet />
+			<Flex
+				direction="column"
+				align="center"
+				justify="center"
+				gap="xl"
+				p="md"
+				style={{ flex: 1 }}
+			>
+				<Outlet />
+			</Flex>
+			<Anchor
+				href={commitUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				size="xs"
+				c="gray.3"
+				ta="center"
+			>
+				{latestCommitHash}
+			</Anchor>
 		</Flex>
 	);
 }

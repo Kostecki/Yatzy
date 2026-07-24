@@ -28,6 +28,9 @@ pnpm install
 # apps/server/.env.example -> apps/server/.env, adjust if needed
 cp apps/server/.env.example apps/server/.env
 
+# apps/web/.env.example -> apps/web/.env, adjust if needed
+cp apps/web/.env.example apps/web/.env
+
 pnpm --filter server dev   # Fastify + tRPC on :3000
 pnpm --filter web dev      # Vite dev server
 
