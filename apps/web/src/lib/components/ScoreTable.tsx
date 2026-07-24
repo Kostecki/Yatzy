@@ -10,7 +10,13 @@ import {
 	TextInput,
 	UnstyledButton,
 } from "@mantine/core";
-import { IconEye, IconEyeOff, IconPlus, IconTrophy } from "@tabler/icons-react";
+import {
+	IconEye,
+	IconEyeOff,
+	IconPlayerPlayFilled,
+	IconPlus,
+	IconTrophy,
+} from "@tabler/icons-react";
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -151,7 +157,14 @@ function PlayerNameHeader({
 					style={{ display: "block", transform: "translateY(-1px)" }}
 				/>
 			)}
-			<Text span fw={700} c={isCurrent ? "green.8" : undefined}>
+			{isCurrent && (
+				<IconPlayerPlayFilled
+					size={12}
+					color="var(--mantine-color-blue-6)"
+					style={{ display: "block" }}
+				/>
+			)}
+			<Text span fw={700}>
 				{player.name}
 			</Text>
 			{isWinner && (
