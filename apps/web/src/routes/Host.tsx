@@ -157,12 +157,11 @@ export default function Host() {
 
 	// Most categories are ready to preview/submit once the target is reached,
 	// even if more dice could still be entered. A relevant-face category is
-	// ready as soon as at least one die is entered — a genuine "zero of this
-	// face" should go through Strike instead, so Submit doesn't stay live on
-	// an empty/reset selection and risk silently overwriting a prior score.
+	// always ready — zero of that face is itself a valid, deliberate result
+	// (e.g. rolling no ones), not something that needs a separate Strike.
 	const diceComplete =
 		relevantFace !== undefined
-			? diceTotal > 0
+			? true
 			: target !== undefined
 				? diceTotal >= target
 				: diceCapacity !== undefined && diceTotal === diceCapacity;
@@ -567,17 +566,19 @@ export default function Host() {
 							);
 						})()}
 
-					<Group justify="center" mt="md">
-						<Button
-							variant="outline"
-							color="gray"
-							size="compact-sm"
-							loading={submitScore.isPending}
-							onClick={() => submit(0)}
-						>
-							{t("host.strike")}
-						</Button>
-					</Group>
+					{relevantFace === undefined && (
+						<Group justify="center" mt="md">
+							<Button
+								variant="outline"
+								color="gray"
+								size="compact-sm"
+								loading={submitScore.isPending}
+								onClick={() => submit(0)}
+							>
+								{t("host.strike")}
+							</Button>
+						</Group>
+					)}
 
 					{selectedFixedValue === undefined && (
 						<Text ta="center" size="lg" fw={600} mb="md">

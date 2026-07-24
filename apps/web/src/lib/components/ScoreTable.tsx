@@ -16,7 +16,12 @@ import { useTranslation } from "react-i18next";
 
 import type { GameMode, SessionState } from "$lib/api/useSessionState";
 import { DieFace } from "$lib/components/DieFace";
-import { exampleDiceGroups, fixedValue, rankPlayers } from "$lib/scoring";
+import {
+	exampleDiceGroups,
+	fixedValue,
+	rankPlayers,
+	upperBonusPace,
+} from "$lib/scoring";
 
 type Category = SessionState["categories"][number];
 
@@ -283,6 +288,21 @@ export function ScoreTable({
 			: 0;
 	}
 
+	// A 0 bonus is ambiguous while the upper section is still in progress —
+	// it could still be reached. Only show it once every upper category is
+	// filled in, so a bare 0 always means "missed," not "not decided yet."
+	function upperComplete(playerId: string) {
+		return upperCategories.every(
+			(c) => scoreFor(playerId, c.id)?.value != null,
+		);
+	}
+
+	function bonusDisplay(playerId: string) {
+		const bonus = bonusFor(playerId);
+		if (bonus > 0) return bonus;
+		return upperComplete(playerId) ? 0 : "";
+	}
+
 	function lowerSubtotal(playerId: string) {
 		return lowerCategories.reduce(
 			(sum, c) => sum + (scoreFor(playerId, c.id)?.value ?? 0),
@@ -337,14 +357,35 @@ export function ScoreTable({
 				</Table.Td>
 				{players.map((player) => {
 					const score = scoreFor(player.id, category.id);
-					// Blank = not played yet. A dash marks a deliberate zero
-					// (crossed out because nothing fit), matching paper sheets.
-					const display =
-						!score || score.value === null
-							? ""
-							: score.value === 0
-								? "-"
-								: score.value;
+					const isEmpty = !score || score.value === null;
+					// Blank = not played yet. A dash marks a deliberate strike (crossed
+					// out because nothing fit), matching paper sheets — upper-section
+					// categories have no strike (zero of a face is itself a valid,
+					// enterable result), so they always show pace instead: how far
+					// above/below "on pace for the bonus" the entry landed, rather than
+					// the raw sum, which on its own doesn't say whether 8 twos is good.
+					let display: ReactNode;
+					if (!score || score.value === null) {
+						display = "";
+					} else if (category.primitive === "sum_of_face" && gameMode) {
+						const face = (category.params as { face: number }).face;
+						const pace = upperBonusPace(gameMode.upperBonusThreshold);
+						const delta = score.value - pace * face;
+						display = (
+							<Text
+								span
+								inherit
+								c={delta > 0 ? "green.9" : delta < 0 ? "red.9" : "dimmed"}
+								opacity={delta === 0 ? undefined : 0.75}
+							>
+								{delta > 0 ? `+${delta}` : delta < 0 ? delta : score.value}
+							</Text>
+						);
+					} else if (score.value === 0) {
+						display = "-";
+					} else {
+						display = score.value;
+					}
 					return (
 						<Table.Td key={player.id} ta="center">
 							{onCellClick ? (
@@ -355,7 +396,7 @@ export function ScoreTable({
 									onClick={() => onCellClick(player.id, category.id)}
 									style={{ userSelect: "none" }}
 								>
-									{display === "" ? (
+									{isEmpty ? (
 										<IconPlus size={14} color="var(--mantine-color-gray-4)" />
 									) : (
 										display
@@ -428,7 +469,7 @@ export function ScoreTable({
 					</Table.Td>
 					{players.map((player) => (
 						<Table.Td key={player.id} ta="center">
-							{bonusFor(player.id)}
+							{bonusDisplay(player.id)}
 						</Table.Td>
 					))}
 				</Table.Tr>
