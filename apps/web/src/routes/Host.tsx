@@ -222,6 +222,26 @@ export default function Host() {
 			? scoreCategory(selectedCategory, diceCounts)
 			: undefined;
 
+	// Mirrors ScoreTable's upper-section display: progress toward the bonus
+	// pace, not the raw sum, since the sum alone doesn't say whether it's
+	// good. Falls back to the raw sum when exactly on pace (delta === 0),
+	// rather than showing a bare 0. A conscious zero (no dice entered at all)
+	// is a real, submittable result too, so it's shown the same way — always
+	// minus whatever pace requires, not specially held at a plain 0.
+	const previewDelta =
+		relevantFace !== undefined && gameMode && previewValue !== undefined
+			? previewValue -
+				upperBonusPace(gameMode.upperBonusThreshold) * relevantFace
+			: undefined;
+	const previewText =
+		previewDelta === undefined
+			? (previewValue ?? 0)
+			: previewDelta > 0
+				? `+${previewDelta}`
+				: previewDelta < 0
+					? previewDelta
+					: previewValue;
+
 	const submitScore = trpc.session.submitScore.useMutation({
 		onSuccess: () => closePanel(),
 	});
@@ -581,8 +601,22 @@ export default function Host() {
 					)}
 
 					{selectedFixedValue === undefined && (
-						<Text ta="center" size="lg" fw={600} mb="md">
-							{t("host.score", { value: previewValue ?? 0 })}
+						<Text
+							ta="center"
+							size="lg"
+							fw={600}
+							mb="md"
+							c={
+								previewDelta === undefined
+									? undefined
+									: previewDelta > 0
+										? "green.9"
+										: previewDelta < 0
+											? "red.9"
+											: "dimmed"
+							}
+						>
+							{t("host.score", { value: previewText })}
 						</Text>
 					)}
 
