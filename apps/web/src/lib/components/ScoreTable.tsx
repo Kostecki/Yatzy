@@ -415,7 +415,9 @@ export function ScoreTable({
 										display
 									)}
 								</Button>
-							) : score?.dice && score.dice.length > 0 ? (
+							) : category.primitive !== "sum_of_face" &&
+								score?.dice &&
+								score.dice.length > 0 ? (
 								<ScoreDicePopover dice={score.dice}>
 									<Text span style={{ cursor: "pointer" }}>
 										{display}
