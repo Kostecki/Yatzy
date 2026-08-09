@@ -74,7 +74,7 @@ importers:
         version: 3.2.2(react@19.2.8)
       '@mantine/charts':
         specifier: ^9.4.1
-        version: 9.4.2(@mantine/core@9.4.1(@mantine/hooks@9.4.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.4.1(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))
+        version: 9.5.1(@mantine/core@9.4.1(@mantine/hooks@9.4.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.4.1(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))
       '@mantine/core':
         specifier: ^9.4.1
         version: 9.4.1(@mantine/hooks@9.4.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1279,11 +1279,11 @@ packages:
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
 
-  '@mantine/charts@9.4.2':
-    resolution: {integrity: sha512-TGS6D517wyyiisFVZFJCnFiO+Ngi8HnF8R22SsNhH2qPhGx/VlLgvVtXPYRuICDX7xEvOOouelVzCnw/+Qb+wQ==}
+  '@mantine/charts@9.5.1':
+    resolution: {integrity: sha512-JLa02nNyct+XVA3YSKGOVHoAMzO6Wg44uUB44SifDTejVFAiehHAM2GOcTqrYBAmYf/uodM/bdZktwNAug5irA==}
     peerDependencies:
-      '@mantine/core': 9.4.2
-      '@mantine/hooks': 9.4.2
+      '@mantine/core': 9.5.1
+      '@mantine/hooks': 9.5.1
       react: ^19.2.0
       react-dom: ^19.2.0
       recharts: '>=3.2.1'
@@ -4887,7 +4887,7 @@ snapshots:
 
   '@lukeed/ms@2.0.2': {}
 
-  '@mantine/charts@9.4.2(@mantine/core@9.4.1(@mantine/hooks@9.4.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.4.1(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))':
+  '@mantine/charts@9.5.1(@mantine/core@9.4.1(@mantine/hooks@9.4.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.4.1(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))':
     dependencies:
       '@mantine/core': 9.4.1(@mantine/hooks@9.4.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@mantine/hooks': 9.4.1(react@19.2.8)
