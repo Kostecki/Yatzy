@@ -20,7 +20,7 @@
     "@fastify/static": "^10.1.0",
     "@fastify/websocket": "^11.3.0",
     "@trpc/server": "^11.18.0",
-    "better-sqlite3": "^12.11.1",
+    "better-sqlite3": "^13.0.0",
     "drizzle-orm": "^0.45.2",
     "fastify": "^5.10.0",
     "zod": "^4.4.3"
