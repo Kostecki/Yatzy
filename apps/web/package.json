@@ -23,10 +23,10 @@
 		"@trpc/client": "11.18.0",
 		"@trpc/react-query": "11.18.0",
 		"canvas-confetti": "1.9.4",
-		"i18next": "26.4.0",
+		"i18next": "26.4.1",
 		"react": "19.2.8",
 		"react-dom": "19.2.8",
-		"react-i18next": "17.0.12",
+		"react-i18next": "17.0.13",
 		"react-qr-code": "2.2.0",
 		"recharts": "3.10.1",
 		"server": "workspace:*"
