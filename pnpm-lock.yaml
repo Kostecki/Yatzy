@@ -30,8 +30,8 @@ importers:
         specifier: 13.0.3
         version: 13.0.3
       drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)
+        specifier: 0.45.3
+        version: 0.45.3(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)
       fastify:
         specifier: 5.12.5
         version: 5.12.5
@@ -46,8 +46,8 @@ importers:
         specifier: 26.6.2
         version: 26.6.2
       drizzle-kit:
-        specifier: 0.31.10
-        version: 0.31.10
+        specifier: 0.31.11
+        version: 0.31.11
       pino-pretty:
         specifier: 13.1.3
         version: 13.1.3
@@ -73,20 +73,20 @@ importers:
         specifier: 3.2.2
         version: 3.2.2(react@19.3.0)
       '@mantine/charts':
-        specifier: 9.6.1
-        version: 9.6.1(@mantine/core@9.6.1(@mantine/hooks@9.6.1(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.6.1(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(recharts@3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@16.13.1)(react@19.3.0)(redux@5.0.1))
+        specifier: 9.6.2
+        version: 9.6.2(@mantine/core@9.6.2(@mantine/hooks@9.6.2(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.6.2(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(recharts@3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@16.13.1)(react@19.3.0)(redux@5.0.1))
       '@mantine/core':
-        specifier: 9.6.1
-        version: 9.6.1(@mantine/hooks@9.6.1(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: 9.6.2
+        version: 9.6.2(@mantine/hooks@9.6.2(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@mantine/hooks':
-        specifier: 9.6.1
-        version: 9.6.1(react@19.3.0)
+        specifier: 9.6.2
+        version: 9.6.2(react@19.3.0)
       '@tabler/icons-react':
         specifier: 3.47.0
         version: 3.47.0(react@19.3.0)
       '@tanstack/react-query':
-        specifier: 5.103.1
-        version: 5.103.1(react@19.3.0)
+        specifier: 5.103.2
+        version: 5.103.2(react@19.3.0)
       '@tanstack/react-router':
         specifier: 1.170.38
         version: 1.170.38(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -95,7 +95,7 @@ importers:
         version: 11.19.0(@trpc/server@11.19.0(typescript@7.0.2))(typescript@7.0.2)
       '@trpc/react-query':
         specifier: 11.19.0
-        version: 11.19.0(@tanstack/react-query@5.103.1(react@19.3.0))(@trpc/client@11.19.0(@trpc/server@11.19.0(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.19.0(typescript@7.0.2))(react@19.3.0)(typescript@7.0.2)
+        version: 11.19.0(@tanstack/react-query@5.103.2(react@19.3.0))(@trpc/client@11.19.0(@trpc/server@11.19.0(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.19.0(typescript@7.0.2))(react@19.3.0)(typescript@7.0.2)
       canvas-confetti:
         specifier: 1.9.4
         version: 1.9.4
@@ -109,8 +109,8 @@ importers:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
       react-i18next:
-        specifier: 17.0.14
-        version: 17.0.14(i18next@26.4.2(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
+        specifier: 17.0.15
+        version: 17.0.15(i18next@26.4.2(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       react-qr-code:
         specifier: 2.2.0
         version: 2.2.0(react@19.3.0)
@@ -1270,24 +1270,24 @@ packages:
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
 
-  '@mantine/charts@9.6.1':
-    resolution: {integrity: sha512-fODlRdZuxMM7iPJHHSpOJFxtJWWhKq+iW+eThgkf/j87M1GonEdvPNV9OtJjEoWM+I51ZjZX9rQZ2g5ouoyTdg==}
+  '@mantine/charts@9.6.2':
+    resolution: {integrity: sha512-zNGLcWHPPXSZbogM3sMT6f9dbOP5DAGyPF2klD51UN06OE5ouRKn0HHM1apvUVFLfr+WpQuWpKAihHHXK1Qmfg==}
     peerDependencies:
-      '@mantine/core': 9.6.1
-      '@mantine/hooks': 9.6.1
+      '@mantine/core': 9.6.2
+      '@mantine/hooks': 9.6.2
       react: ^19.2.0
       react-dom: ^19.2.0
       recharts: '>=3.2.1'
 
-  '@mantine/core@9.6.1':
-    resolution: {integrity: sha512-UkcPo8Zq0uSdodvyXV62HVmfIfHCcrjFrFrH0TggTy6Wtp8a78znGP8RJOz8zC9XSPpJmKjBQjg0M+nOvIzftA==}
+  '@mantine/core@9.6.2':
+    resolution: {integrity: sha512-6W7xA3FRlGMclVDCY5U6rqhgzc+x+7G3nR9rntcjtF/Slnkp79Em8yjAB01F0wBSnrBUMK1TqKENf5o5WHiPOA==}
     peerDependencies:
-      '@mantine/hooks': 9.6.1
+      '@mantine/hooks': 9.6.2
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@mantine/hooks@9.6.1':
-    resolution: {integrity: sha512-pfxM95WozngB0ZALw6h99QV1TQ0qniOkFhzi0+dmSnKpxkVSR0xeNsvPpGDj9Teu+M69fRoE4IkzyMnu5Xld3w==}
+  '@mantine/hooks@9.6.2':
+    resolution: {integrity: sha512-SfNY0FvYi8vMytZbioQVx5JyX0dmLUQEmbgbQQXqe4iOto0QZ896XwhgMQ6g/FCWkvc9JHeHp7iPu4msqQFIEw==}
     peerDependencies:
       react: ^19.2.0
 
@@ -1612,11 +1612,11 @@ packages:
     resolution: {integrity: sha512-utTS5L2OkeYUzXGohL1Z8sefu1GLNOJcxe8Hd6iIdc/Xo1K1nDB2JEp4iSFhvYh33xKC9V91TxrS8qfrpoKobQ==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/query-core@5.103.1':
-    resolution: {integrity: sha512-rms8HqTGp6zA00dM+cUQ2eBcgzNJefuu5CAMB37i/6MiGT1zulPOytCFu2a0qjLqVR2n1jENPj9woqFQNuCzWA==}
+  '@tanstack/query-core@5.103.2':
+    resolution: {integrity: sha512-I8DkFXls5jXLqtm8+QpOhEmG07hIblhSZFzafg9wHsMSEvMzULy9hK17wU1T/ahfhMbtITJhbxutwwCoihkR7A==}
 
-  '@tanstack/react-query@5.103.1':
-    resolution: {integrity: sha512-rmAPPApNEK17VXRJhtE1rja53n23VV5w30C0saCgJhhX+EpdUnVqMGV/s5nnzV43X75KTHKzuoiuxSzGTBIkag==}
+  '@tanstack/react-query@5.103.2':
+    resolution: {integrity: sha512-B+fWiYZBc+0uUD5zDZAeLw9dKj7XEsdnuu6zRZ+no6LNKpeE3P3bJ+N6HINjcIlWR6fW3vUoTneEaGa2V6ehqw==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -2160,12 +2160,12 @@ packages:
   detect-node-es@1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
 
-  drizzle-kit@0.31.10:
-    resolution: {integrity: sha512-7OZcmQUrdGI+DUNNsKBn1aW8qSoKuTH7d0mYgSP8bAzdFzKoovxEFnoGQp2dVs82EOJeYycqRtciopszwUf8bw==}
+  drizzle-kit@0.31.11:
+    resolution: {integrity: sha512-YCYqxTLIB2OCqf6w9/Vef13baBVbwQIPcbT4Y56AfO6B9ajZhDhD8Jkveg/hJvT/iuMloKD/IYYkyMMNhr7Kqg==}
     hasBin: true
 
-  drizzle-orm@0.45.2:
-    resolution: {integrity: sha512-kY0BSaTNYWnoDMVoyY8uxmyHjpJW1geOmBMdSSicKo9CIIWkSxMIj2rkeSR51b8KAPB7m+qysjuHme5nKP+E5Q==}
+  drizzle-orm@0.45.3:
+    resolution: {integrity: sha512-CAloER21cDdcgZ1OmjrZX82EeRNsdP+y0onX/eyoYDaYzki/adrAa91lzM5jWh7zZPK4qUbw/6LGv9J+A+uizA==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -2173,6 +2173,7 @@ packages:
       '@libsql/client': '>=0.10.0'
       '@libsql/client-wasm': '>=0.10.0'
       '@neondatabase/serverless': '>=0.10.0'
+      '@netlify/db': '>=0.4.0'
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
       '@planetscale/database': '>=1.13'
@@ -2208,6 +2209,8 @@ packages:
       '@libsql/client-wasm':
         optional: true
       '@neondatabase/serverless':
+        optional: true
+      '@netlify/db':
         optional: true
       '@op-engineering/op-sqlite':
         optional: true
@@ -2956,8 +2959,8 @@ packages:
     peerDependencies:
       react: ^19.3.0
 
-  react-i18next@17.0.14:
-    resolution: {integrity: sha512-ZpMBfJL3BiXPuYHj5QMY1GwvKJNhE1vCxOJQ8BoMBdHP5XONTfi/Qss1nuRlnFdIl72PKo2jPmw+fxuLjRFgaQ==}
+  react-i18next@17.0.15:
+    resolution: {integrity: sha512-7uYpx/oBkesLto7cOzOmfITlUBaXHCAcFahmgETMfWr8nbbWRRnVGvz8wsH/xpbNcyoH+NpCcnOQEqWPMO6/hw==}
     peerDependencies:
       i18next: '>= 26.2.0'
       react: '>= 16.8.0'
@@ -4757,18 +4760,18 @@ snapshots:
 
   '@lukeed/ms@2.0.2': {}
 
-  '@mantine/charts@9.6.1(@mantine/core@9.6.1(@mantine/hooks@9.6.1(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.6.1(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(recharts@3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@16.13.1)(react@19.3.0)(redux@5.0.1))':
+  '@mantine/charts@9.6.2(@mantine/core@9.6.2(@mantine/hooks@9.6.2(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.6.2(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(recharts@3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@16.13.1)(react@19.3.0)(redux@5.0.1))':
     dependencies:
-      '@mantine/core': 9.6.1(@mantine/hooks@9.6.1(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@mantine/hooks': 9.6.1(react@19.3.0)
+      '@mantine/core': 9.6.2(@mantine/hooks@9.6.2(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@mantine/hooks': 9.6.2(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       recharts: 3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@16.13.1)(react@19.3.0)(redux@5.0.1)
 
-  '@mantine/core@9.6.1(@mantine/hooks@9.6.1(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@mantine/core@9.6.2(@mantine/hooks@9.6.2(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@floating-ui/react': 0.27.20(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@mantine/hooks': 9.6.1(react@19.3.0)
+      '@mantine/hooks': 9.6.2(react@19.3.0)
       clsx: 2.1.1
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
@@ -4778,7 +4781,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/hooks@9.6.1(react@19.3.0)':
+  '@mantine/hooks@9.6.2(react@19.3.0)':
     dependencies:
       react: 19.3.0
 
@@ -4976,11 +4979,11 @@ snapshots:
 
   '@tanstack/history@1.162.4': {}
 
-  '@tanstack/query-core@5.103.1': {}
+  '@tanstack/query-core@5.103.2': {}
 
-  '@tanstack/react-query@5.103.1(react@19.3.0)':
+  '@tanstack/react-query@5.103.2(react@19.3.0)':
     dependencies:
-      '@tanstack/query-core': 5.103.1
+      '@tanstack/query-core': 5.103.2
       react: 19.3.0
 
   '@tanstack/react-router@1.170.38(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
@@ -5020,9 +5023,9 @@ snapshots:
       '@trpc/server': 11.19.0(typescript@7.0.2)
       typescript: 7.0.2
 
-  '@trpc/react-query@11.19.0(@tanstack/react-query@5.103.1(react@19.3.0))(@trpc/client@11.19.0(@trpc/server@11.19.0(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.19.0(typescript@7.0.2))(react@19.3.0)(typescript@7.0.2)':
+  '@trpc/react-query@11.19.0(@tanstack/react-query@5.103.2(react@19.3.0))(@trpc/client@11.19.0(@trpc/server@11.19.0(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.19.0(typescript@7.0.2))(react@19.3.0)(typescript@7.0.2)':
     dependencies:
-      '@tanstack/react-query': 5.103.1(react@19.3.0)
+      '@tanstack/react-query': 5.103.2(react@19.3.0)
       '@trpc/client': 11.19.0(@trpc/server@11.19.0(typescript@7.0.2))(typescript@7.0.2)
       '@trpc/server': 11.19.0(typescript@7.0.2)
       react: 19.3.0
@@ -5428,14 +5431,14 @@ snapshots:
 
   detect-node-es@1.1.0: {}
 
-  drizzle-kit@0.31.10:
+  drizzle-kit@0.31.11:
     dependencies:
       '@drizzle-team/brocli': 0.10.2
       '@esbuild-kit/esm-loader': 2.6.5
       esbuild: 0.25.12
       tsx: 4.23.15
 
-  drizzle-orm@0.45.2(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3):
+  drizzle-orm@0.45.3(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3):
     optionalDependencies:
       '@types/better-sqlite3': 9.6.0
       better-sqlite3: 13.0.3
@@ -6241,7 +6244,7 @@ snapshots:
       react: 19.3.0
       scheduler: 0.28.0
 
-  react-i18next@17.0.14(i18next@26.4.2(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2):
+  react-i18next@17.0.15(i18next@26.4.2(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2):
     dependencies:
       '@babel/runtime': 7.29.7
       html-parse-stringify: 4.0.1
