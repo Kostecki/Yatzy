@@ -17,7 +17,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@fastify/static": "10.1.4",
+    "@fastify/static": "10.1.5",
     "@fastify/websocket": "11.3.1",
     "@trpc/server": "11.19.0",
     "better-sqlite3": "13.0.3",
