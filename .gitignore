@@ -210,3 +210,6 @@ package
 .claude/settings.local.json
 
 thoughts.txt
+
+# Docker Compose: env file and local data folders
+/data/
