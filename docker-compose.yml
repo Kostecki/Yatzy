@@ -15,10 +15,10 @@ services:
   drizzle-gateway:
     image: ghcr.io/drizzle-team/gateway:latest
     container_name: yatzy-drizzle-gateway
-    hostname: yatzy-drizzle-gateway-docker-tower
+    hostname: ${DRIZZLE_HOSTNAME:-drizzle-gateway}
     restart: unless-stopped
     ports:
-      - "4982:4983"
+      - "${DRIZZLE_PORT:-4983}:4983"
     environment:
       MASTERPASS: ${DRIZZLE_GATEWAY_MASTERPASS}
     volumes:
