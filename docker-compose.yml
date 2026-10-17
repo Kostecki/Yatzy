@@ -1,14 +1,28 @@
 services:
   yatzy:
-    build: .
+    image: ghcr.io/kostecki/yatzy:latest
     restart: unless-stopped
+    container_name: yatzy
+    hostname: ${APP_HOSTNAME:-yatzy}
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
       NODE_ENV: production
-      DATABASE_PATH: /data/yatzy.sqlite
+      DATABASE_PATH: /data/database/yatzy.sqlite
     volumes:
-      - yatzy-data:/data
+      - ${DATA_DIR:-.}/data:/data
 
-volumes:
-  yatzy-data: {}
+  drizzle-gateway:
+    image: ghcr.io/drizzle-team/gateway:latest
+    container_name: yatzy-drizzle-gateway
+    hostname: yatzy-drizzle-gateway-docker-tower
+    restart: unless-stopped
+    ports:
+      - "4982:4983"
+    environment:
+      MASTERPASS: ${DRIZZLE_GATEWAY_MASTERPASS}
+    volumes:
+      - ${DATA_DIR:-.}/data/database:/database
+      - ${DATA_DIR:-.}/data/drizzle_gateway:/app
+    labels:
+      - "nautical-backup.group=yatzy"
