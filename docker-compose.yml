@@ -3,6 +3,8 @@ services:
     image: ghcr.io/kostecki/yatzy:latest
     restart: unless-stopped
     container_name: yatzy
+    labels:
+      - "nautical-backup.group=yatzy"
     hostname: ${APP_HOSTNAME:-yatzy}
     ports:
       - "${APP_PORT:-3000}:3000"
@@ -26,3 +28,4 @@ services:
       - ${DATA_DIR:-.}/data/drizzle_gateway:/app
     labels:
       - "nautical-backup.group=yatzy"
+      - "nautical-backup.override-source-dir=yatzy"
