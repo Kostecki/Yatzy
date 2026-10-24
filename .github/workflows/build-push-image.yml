@@ -8,6 +8,7 @@ on:
       - "apps/web/**"
       - "apps/server/**"
       - "Dockerfile"
+      - "docker-compose.yml"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - ".github/workflows/build-push-image.yml"
