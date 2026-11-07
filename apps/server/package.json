@@ -19,7 +19,7 @@
   "dependencies": {
     "@fastify/static": "10.1.8",
     "@fastify/websocket": "11.3.6",
-    "@trpc/server": "11.23.0",
+    "@trpc/server": "11.24.0",
     "better-sqlite3": "13.0.3",
     "drizzle-orm": "0.45.4",
     "fastify": "5.12.8",
