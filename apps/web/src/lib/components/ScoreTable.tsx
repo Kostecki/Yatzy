@@ -237,6 +237,39 @@ function PlayerNameHeader({
 	);
 }
 
+function ScoreDicePopover({
+	dice,
+	children,
+}: {
+	dice: number[];
+	children: ReactNode;
+}) {
+	const [opened, setOpened] = useState(false);
+	return (
+		<Popover
+			opened={opened}
+			onChange={setOpened}
+			withArrow
+			shadow="md"
+			position="bottom"
+		>
+			<Popover.Target>
+				<UnstyledButton onClick={() => setOpened((o) => !o)}>
+					{children}
+				</UnstyledButton>
+			</Popover.Target>
+			<Popover.Dropdown>
+				<Group gap={4} wrap="wrap" maw={200} justify="center">
+					{dice.map((face, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: dice are indistinguishable
+						<DieFace key={i} value={face} size={28} active />
+					))}
+				</Group>
+			</Popover.Dropdown>
+		</Popover>
+	);
+}
+
 export function ScoreTable({
 	sessionState,
 	gameMode,
@@ -326,39 +359,6 @@ export function ScoreTable({
 	function grandTotal(playerId: string) {
 		return (
 			upperSubtotal(playerId) + bonusFor(playerId) + lowerSubtotal(playerId)
-		);
-	}
-
-	function ScoreDicePopover({
-		dice,
-		children,
-	}: {
-		dice: number[];
-		children: ReactNode;
-	}) {
-		const [opened, setOpened] = useState(false);
-		return (
-			<Popover
-				opened={opened}
-				onChange={setOpened}
-				withArrow
-				shadow="md"
-				position="bottom"
-			>
-				<Popover.Target>
-					<UnstyledButton onClick={() => setOpened((o) => !o)}>
-						{children}
-					</UnstyledButton>
-				</Popover.Target>
-				<Popover.Dropdown>
-					<Group gap={4} wrap="wrap" maw={200} justify="center">
-						{dice.map((face, i) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: dice are indistinguishable
-							<DieFace key={i} value={face} size={28} active />
-						))}
-					</Group>
-				</Popover.Dropdown>
-			</Popover>
 		);
 	}
 

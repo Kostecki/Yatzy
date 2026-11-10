@@ -6,15 +6,15 @@ import {
 	categoryAveragesByPlayer,
 	categoryStats,
 	diceFaceFrequency,
+	type GameModesById,
 	gamesOverTime,
 	overview,
 	playerLeaderboard,
+	type StatsSession,
 	scoreDistribution,
 	scoreExtremes,
 	turnOrderAdvantage,
 	yatzyHitRate,
-	type GameModesById,
-	type StatsSession,
 } from "./stats";
 
 const NORMAL: GameModesById = {
@@ -32,7 +32,12 @@ describe("diceFaceFrequency", () => {
 				players: [{ id: "p1", name: "Alice", orderIndex: 0 }],
 				categories: [{ id: "ones", section: "upper" }],
 				scores: [
-					{ playerId: "p1", categoryId: "ones", value: 3, dice: [1, 1, 1, 4, 5] },
+					{
+						playerId: "p1",
+						categoryId: "ones",
+						value: 3,
+						dice: [1, 1, 1, 4, 5],
+					},
 				],
 			},
 			{
@@ -310,9 +315,21 @@ describe("categoryAveragesByPlayer", () => {
 describe("gamesOverTime", () => {
 	it("buckets finished games by calendar day, sorted ascending", () => {
 		const sessions: StatsSession[] = [
-			{ ...twoPlayerSession(), sessionCode: "A", finishedAt: "2026-01-02T10:00:00Z" },
-			{ ...twoPlayerSession(), sessionCode: "B", finishedAt: "2026-01-01T10:00:00Z" },
-			{ ...twoPlayerSession(), sessionCode: "C", finishedAt: "2026-01-01T15:00:00Z" },
+			{
+				...twoPlayerSession(),
+				sessionCode: "A",
+				finishedAt: "2026-01-02T10:00:00Z",
+			},
+			{
+				...twoPlayerSession(),
+				sessionCode: "B",
+				finishedAt: "2026-01-01T10:00:00Z",
+			},
+			{
+				...twoPlayerSession(),
+				sessionCode: "C",
+				finishedAt: "2026-01-01T15:00:00Z",
+			},
 		];
 
 		expect(gamesOverTime(sessions)).toEqual([
@@ -322,7 +339,10 @@ describe("gamesOverTime", () => {
 	});
 
 	it("ignores unfinished sessions", () => {
-		const unfinished: StatsSession = { ...twoPlayerSession(), finishedAt: null };
+		const unfinished: StatsSession = {
+			...twoPlayerSession(),
+			finishedAt: null,
+		};
 		expect(gamesOverTime([unfinished])).toEqual([]);
 	});
 });
@@ -341,7 +361,10 @@ describe("overview", () => {
 	});
 
 	it("handles sessions with no finished games", () => {
-		const unfinished: StatsSession = { ...twoPlayerSession(), finishedAt: null };
+		const unfinished: StatsSession = {
+			...twoPlayerSession(),
+			finishedAt: null,
+		};
 		const summary = overview([unfinished]);
 		expect(summary.avgDurationMs).toBeUndefined();
 		expect(summary.longestDurationMs).toBeUndefined();

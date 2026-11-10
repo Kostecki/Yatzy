@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Lint and format
+        run: pnpm lint
+
       - name: Typecheck server (including tests)
         run: pnpm --filter server typecheck
 
