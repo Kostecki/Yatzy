@@ -14,13 +14,7 @@ See [PLAN.md](PLAN.md) for the full design/architecture writeup.
 
 ## Local development
 
-This repo pins its toolchain with [Volta](https://volta.sh) (see the `volta` field in the root `package.json`) — install it once and it automatically switches to the right Node (26.3.0) and pnpm (11.13.1) versions whenever you're in this directory, no manual version management needed:
-
-```sh
-curl https://get.volta.sh | bash
-```
-
-Without Volta, just make sure Node 26.3.0 and pnpm 11.13.1 (or compatible) are on your `PATH` yourself.
+This repo pins Node in `mise.toml` (26.13.0) and pnpm in the `packageManager` field of `package.json` (12.18.0). With [mise](https://mise.jdx.dev) installed, `mise install` sets up Node; install pnpm with `npm install -g pnpm@12.18.0`.
 
 ```sh
 pnpm install

@@ -15,8 +15,5 @@
     "@biomejs/biome": "2.6.6",
     "concurrently": "10.0.6"
   },
-  "volta": {
-    "node": "26.13.0",
-    "pnpm": "12.18.0"
-  }
+  "packageManager": "pnpm@12.18.0"
 }

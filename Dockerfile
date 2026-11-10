@@ -1,11 +1,12 @@
 # ---- deps: install once, cached unless a manifest changes ----
-FROM node:26-alpine AS deps
+FROM node:26.13.0-alpine AS deps
 # python3/make/g++ are needed to compile better-sqlite3's native addon on
 # musl (alpine) — there's no guaranteed prebuilt binary for this combo.
 RUN apk add --no-cache python3 make g++
-RUN npm install -g pnpm@11.13.1
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# pnpm version comes from the packageManager field in package.json
+RUN npm install -g "$(node -p "require('./package.json').packageManager")"
 COPY apps/server/package.json apps/server/package.json
 COPY apps/web/package.json apps/web/package.json
 RUN pnpm install --frozen-lockfile
@@ -32,7 +33,7 @@ FROM build AS prod-deps
 RUN pnpm --filter server deploy --prod --legacy /prod/server
 
 # ---- runtime: minimal final image ----
-FROM node:26-alpine AS runtime
+FROM node:26.13.0-alpine AS runtime
 # better-sqlite3's compiled addon dynamically links libstdc++, which the
 # bare alpine image doesn't ship (only the build stage's g++ install pulls
 # it in) — without this it fails at require() time, not build time.
