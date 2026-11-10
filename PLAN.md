@@ -21,7 +21,7 @@ Self-hosted (Docker, no ongoing SaaS), used mainly on iPads (host) and iPhones (
 
 Sourced directly from `5-dice.txt` / `6-dice.txt` / `giant.txt`. Most categories are **sum-based** (computed from the dice actually rolled); a handful are **fixed** all-or-nothing values regardless of which faces make up the pattern — the straights, Giant's Claus/Knold/Tot/Kaptajn Vom family, and Yatzy.
 
-**General sum rule** (confirmed): every sum-based pattern category — pairs, n-of-a-kind, the ×N groups, the size-A+size-B combos — scores using *exactly* the dice required to satisfy the pattern, never any extra matching dice beyond what's needed and never the rest of the roll. E.g. Giant's "3 of a kind" with five 6s rolled still scores `3×6=18`, not `5×6=30`. A category is *eligible* with "at least N" matching dice present, but only *scores* on exactly N of them.
+**General sum rule** (confirmed): every sum-based pattern category — pairs, n-of-a-kind, the ×N groups, the size-A+size-B combos — scores using _exactly_ the dice required to satisfy the pattern, never any extra matching dice beyond what's needed and never the rest of the roll. E.g. Giant's "3 of a kind" with five 6s rolled still scores `3×6=18`, not `5×6=30`. A category is _eligible_ with "at least N" matching dice present, but only _scores_ on exactly N of them.
 
 - **Normal** — 5 dice. Upper bonus: minimum 63, bonus 50 (3 of each).
   Ones–Sixes · 1 Pair · 2 Pairs · 3 of a Kind · 4 of a Kind · House (3+2) · Lille (1-5 straight, fixed 15) · Stor (2-6 straight, fixed 20) · Chance · Yatzy (fixed 50)
@@ -46,10 +46,12 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 - **Typo fixes**: host can rename a player after the fact.
 - **Cross-out / "no score"**: part of the normal per-category entry flow (the "Strike" button, not a separate button elsewhere), writes a real `0`. No separate flag distinguishes "chose to cross out" from "rolled and it scored zero" — every zero is rule-legitimate. **Resolved**: displayed as a dash (`-`), not a plain `0`, so a deliberate/computed zero reads clearly as "filled in" rather than "blank."
 - **Upper section relative display**: each upper-section cell shows a signed delta relative to the per-face target needed for the bonus, not the raw score:
+
   ```
   delta = actualScore - (requiredCount × faceValue)
   requiredCount = mode.upperBonusThreshold / 21
   ```
+
   e.g. five 1s on Family → **+1**, three 6s → **-6**. Purely a display computation, no schema impact.
 - **Bonus progress indicator**: running subtotal of the deltas filled in so far, shown near the upper section, so pace-to-bonus is visible at a glance.
 - **Yatzy bonus**: flat bonus, per mode (Normal 50, Family 50, Giant 250), with an optional "extra points equal to eyes rolled" variant (`includeEyesBonus`) kept available per-mode for future custom modes even though none of the three built-in modes currently use it. No stacking bonus for multiple Yatzys in one game.
@@ -82,84 +84,125 @@ Architecture supports adding a new mode (like Giant was) as close to a **data-on
 ## Data model (Drizzle / SQLite)
 
 ```ts
-export const gameModes = sqliteTable('game_modes', {
-  id: text('id').primaryKey(),                 // "normal" | "family" | "giant" | uuid for custom
-  name: text('name').notNull(),
-  description: text('description').notNull(),
-  diceCount: integer('dice_count').notNull(),
-  isBuiltin: integer('is_builtin', { mode: 'boolean' }).notNull().default(false),
-  upperBonusThreshold: integer('upper_bonus_threshold').notNull(),
-  upperBonusAmount: integer('upper_bonus_amount').notNull(),
+export const gameModes = sqliteTable("game_modes", {
+	id: text("id").primaryKey(), // "normal" | "family" | "giant" | uuid for custom
+	name: text("name").notNull(),
+	description: text("description").notNull(),
+	diceCount: integer("dice_count").notNull(),
+	isBuiltin: integer("is_builtin", { mode: "boolean" })
+		.notNull()
+		.default(false),
+	upperBonusThreshold: integer("upper_bonus_threshold").notNull(),
+	upperBonusAmount: integer("upper_bonus_amount").notNull(),
 });
 
-export const categories = sqliteTable('categories', {
-  id: text('id').primaryKey(),                 // slug, e.g. "three_kind"
-  label: text('label'),                        // override; falls back to the primitive's generated default label if null
-  description: text('description').notNull(), // tooltip copy
-  section: text('section', { enum: ['upper', 'lower'] }).notNull(),
-  primitive: text('primitive').notNull(),       // key into the code-side scoring catalog
-  params: text('params', { mode: 'json' }).notNull(),     // e.g. {} for chance, { face: 1 }, { n: 3 }, { flatBonus, includeEyesBonus }
-  exampleDice: text('example_dice', { mode: 'json' }), // number[]; null = no static example, tooltip computes one dynamically (currently only sum_of_face categories)
+export const categories = sqliteTable("categories", {
+	id: text("id").primaryKey(), // slug, e.g. "three_kind"
+	label: text("label"), // override; falls back to the primitive's generated default label if null
+	description: text("description").notNull(), // tooltip copy
+	section: text("section", { enum: ["upper", "lower"] }).notNull(),
+	primitive: text("primitive").notNull(), // key into the code-side scoring catalog
+	params: text("params", { mode: "json" }).notNull(), // e.g. {} for chance, { face: 1 }, { n: 3 }, { flatBonus, includeEyesBonus }
+	exampleDice: text("example_dice", { mode: "json" }), // number[]; null = no static example, tooltip computes one dynamically (currently only sum_of_face categories)
 });
 
-export const gameModeCategories = sqliteTable('game_mode_categories', {
-  gameModeId: text('game_mode_id').notNull().references(() => gameModes.id),
-  categoryId: text('category_id').notNull().references(() => categories.id),
-  orderIndex: integer('order_index').notNull(),
-  labelOverride: text('label_override'), // null = use categories.label (or its own fallback); set when the same category needs a different display name for this mode (e.g. House vs. Lillemor)
-}, (t) => ({ pk: primaryKey({ columns: [t.gameModeId, t.categoryId] }) }));
+export const gameModeCategories = sqliteTable(
+	"game_mode_categories",
+	{
+		gameModeId: text("game_mode_id")
+			.notNull()
+			.references(() => gameModes.id),
+		categoryId: text("category_id")
+			.notNull()
+			.references(() => categories.id),
+		orderIndex: integer("order_index").notNull(),
+		labelOverride: text("label_override"), // null = use categories.label (or its own fallback); set when the same category needs a different display name for this mode (e.g. House vs. Lillemor)
+	},
+	(t) => ({ pk: primaryKey({ columns: [t.gameModeId, t.categoryId] }) }),
+);
 
-export const sessionCategories = sqliteTable('session_categories', {
-  sessionCode: text('session_code').notNull().references(() => sessions.code),
-  categoryId: text('category_id').notNull().references(() => categories.id),
-  orderIndex: integer('order_index').notNull(),
-  labelOverride: text('label_override'), // copied from game_mode_categories.labelOverride at session creation, same reasoning as everything else in this table being a locked-in resolved copy
-}, (t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.categoryId] }) }));
+export const sessionCategories = sqliteTable(
+	"session_categories",
+	{
+		sessionCode: text("session_code")
+			.notNull()
+			.references(() => sessions.code),
+		categoryId: text("category_id")
+			.notNull()
+			.references(() => categories.id),
+		orderIndex: integer("order_index").notNull(),
+		labelOverride: text("label_override"), // copied from game_mode_categories.labelOverride at session creation, same reasoning as everything else in this table being a locked-in resolved copy
+	},
+	(t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.categoryId] }) }),
+);
 
-export const sessions = sqliteTable('sessions', {
-  code: text('code').primaryKey(),              // short human code
-  gameModeId: text('game_mode_id').notNull().references(() => gameModes.id),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  finishedAt: integer('finished_at', { mode: 'timestamp' }),  // null = in progress, set = finished (also the history sort key)
+export const sessions = sqliteTable("sessions", {
+	code: text("code").primaryKey(), // short human code
+	gameModeId: text("game_mode_id")
+		.notNull()
+		.references(() => gameModes.id),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	finishedAt: integer("finished_at", { mode: "timestamp" }), // null = in progress, set = finished (also the history sort key)
 });
 
-export const players = sqliteTable('players', {
-  id: text('id').primaryKey(),
-  sessionCode: text('session_code').notNull().references(() => sessions.code),
-  name: text('name').notNull(),
-  orderIndex: integer('order_index').notNull(),
+export const players = sqliteTable("players", {
+	id: text("id").primaryKey(),
+	sessionCode: text("session_code")
+		.notNull()
+		.references(() => sessions.code),
+	name: text("name").notNull(),
+	orderIndex: integer("order_index").notNull(),
 });
 
-export const scores = sqliteTable('scores', {
-  sessionCode: text('session_code').notNull().references(() => sessions.code),
-  playerId: text('player_id').notNull().references(() => players.id),
-  categoryId: text('category_id').notNull().references(() => categories.id),
-  value: integer('value'),                      // null = not yet entered, 0 = filled in as zero
-  dice: text('dice', { mode: 'json' }).$type<number[]>(), // the dice actually submitted, in entry order; null for a Strike or a fixed-value (straight) category
-  updatedAt: integer('updated_at', { mode: 'timestamp' }),
-}, (t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.playerId, t.categoryId] }) }));
+export const scores = sqliteTable(
+	"scores",
+	{
+		sessionCode: text("session_code")
+			.notNull()
+			.references(() => sessions.code),
+		playerId: text("player_id")
+			.notNull()
+			.references(() => players.id),
+		categoryId: text("category_id")
+			.notNull()
+			.references(() => categories.id),
+		value: integer("value"), // null = not yet entered, 0 = filled in as zero
+		dice: text("dice", { mode: "json" }).$type<number[]>(), // the dice actually submitted, in entry order; null for a Strike or a fixed-value (straight) category
+		updatedAt: integer("updated_at", { mode: "timestamp" }),
+	},
+	(t) => ({
+		pk: primaryKey({ columns: [t.sessionCode, t.playerId, t.categoryId] }),
+	}),
+);
 
-export const hostTokens = sqliteTable('host_tokens', {
-  sessionCode: text('session_code').notNull().references(() => sessions.code),
-  tokenHash: text('token_hash').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-}, (t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.tokenHash] }) }));
+export const hostTokens = sqliteTable(
+	"host_tokens",
+	{
+		sessionCode: text("session_code")
+			.notNull()
+			.references(() => sessions.code),
+		tokenHash: text("token_hash").notNull(),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	},
+	(t) => ({ pk: primaryKey({ columns: [t.sessionCode, t.tokenHash] }) }),
+);
 ```
 
 Notes:
+
 - `params`/`exampleDice` as JSON columns (SQLite JSON1 + Drizzle's `mode: 'json'`) avoid a table per primitive shape.
 - Composite primary keys on join-ish tables avoid meaningless surrogate ids.
 - Host tokens are stored hashed, in their own table, so a DB backup doesn't hand out live edit access to an open game, and so more than one token can be valid for the same session (see "Multi-device host access" in Product/UX decisions) — this replaced the original single `sessions.hostTokenHash` column design.
 - `scores.dice` is a later addition (not in the original plan, which assumed dice were never persisted — see "Dice-input UI design" under Open items) — stores exactly what the host submitted, in entry order, so it can be shown back on the score table or when reopening a cell to correct it.
 - `upperBonusThreshold` / `upperBonusAmount` live on `game_modes` so each mode configures its own bonus rule (Normal: 63/50; Family: 84/50; Giant: 189/200).
-- **Category rows are not deduplicated by primitive+params, and sharing a row across modes is optional, never required — but when only the *name* differs, use `gameModeCategories.labelOverride` instead of a separate row.** `house` (Normal/Family) and Giant's "Lillemor" are the same `two_groups_sizes({sizeA:3, sizeB:2})`, same description, same everything except what it's called — that's one category row, referenced by both, with Giant's `game_mode_categories` link setting `labelOverride: "Lillemor"`. Same for `lille`/"Lav", `stor`/"Høj", `royal`/"Cameron". Separate rows are still the right call when something *other* than the name differs (different `params`, different `description`, etc.) — the override only covers "identical in every way except display name."
+- **Category rows are not deduplicated by primitive+params, and sharing a row across modes is optional, never required — but when only the _name_ differs, use `gameModeCategories.labelOverride` instead of a separate row.** `house` (Normal/Family) and Giant's "Lillemor" are the same `two_groups_sizes({sizeA:3, sizeB:2})`, same description, same everything except what it's called — that's one category row, referenced by both, with Giant's `game_mode_categories` link setting `labelOverride: "Lillemor"`. Same for `lille`/"Lav", `stor`/"Høj", `royal`/"Cameron". Separate rows are still the right call when something _other_ than the name differs (different `params`, different `description`, etc.) — the override only covers "identical in every way except display name."
 - **`sessionCategories` vs. `gameModeCategories`**: `gameModeCategories` is just the default template per built-in mode, used to pre-populate the picker when starting a new game. `sessionCategories` is the resolved, locked-in category list for one specific session — copied from the mode's defaults at creation time, with any per-session add/remove tweaks already applied. This is what actually drives the scorecard, not `gameModeCategories`. See "Per-session category tweaks" below for why this exists as its own table instead of being derived on the fly.
 
 ---
 
 ## Scoring engine
 
-**Split**: scoring *logic* lives in code as a fixed catalog of pure, unit-tested primitive functions. Scoring *configuration* (which categories, in what order, for which mode, with what params) lives in the DB. This avoids storing executable logic as data (an eval security hole or a bespoke DSL — overkill for this app) while still making "add a mode" a data operation in the common case.
+**Split**: scoring _logic_ lives in code as a fixed catalog of pure, unit-tested primitive functions. Scoring _configuration_ (which categories, in what order, for which mode, with what params) lives in the DB. This avoids storing executable logic as data (an eval security hole or a bespoke DSL — overkill for this app) while still making "add a mode" a data operation in the common case.
 
 **Adding Giant later** = insert a `game_modes` row + `categories`/`game_mode_categories` rows for anything that reuses an existing primitive — no code change, no redeploy. In practice, mapping Giant's full ruleset onto the primitives already needed for Normal/Family required exactly **one** genuinely new primitive (`straight_plus_extra`, for the Claus/Knold/Tot/Kaptajn Vom family) — everything else in Giant's 30+ categories reuses the same primitives Normal/Family already need, just with different params. Good validation that this split holds up even for a much more complex mode.
 
@@ -182,21 +225,23 @@ Notes:
 
 **`exampleDice` stores only the meaningful/matching dice, no filler** — e.g. `[6,6,6]` for "Three of a Kind," not padded out to any particular dice count. The tooltip UI pads it out to whichever mode's actual dice count it's currently being shown for (5/6/12), using arbitrary non-matching filler, at render time. This is what keeps a category row shareable across modes despite different dice counts — the visual always matches the mode you're looking at without needing separate stored rows per mode. One primitive is the exception: `yatzy` needs every die to match, so its padding rule is "repeat the matching value," not "add arbitrary filler." This applies to every primitive **except** `sum_of_face` — see below.
 
-**Upper section (`sum_of_face`) is a special case, both for the text hint and the visual example.** Unlike the other primitives, its "required count" isn't in the category's own `params` at all — it comes from the *mode's* bonus threshold (`requiredCount = mode.upperBonusThreshold / 21`: 3 for Normal, 4 for Family, 9 for Giant), the same number the delta-display cells already compute. Because that number is mode-dependent and only knowable at render time, the tooltip doesn't use a stored `exampleDice` for these categories at all — it synthesizes the *entire* example live from `(mode, category.params.face)`: `requiredCount` dice showing `params.face`, padded with filler to `mode.diceCount`. Ones–Sixes store `exampleDice: null` for exactly this reason — there's nothing meaningful to store, so the column honestly reflects that instead of holding a placeholder value nothing reads. The tooltip also needs mode context for this to work even outside an active game, since it's shown during mode selection too, before any session/delta-display exists to fall back on.
+**Upper section (`sum_of_face`) is a special case, both for the text hint and the visual example.** Unlike the other primitives, its "required count" isn't in the category's own `params` at all — it comes from the _mode's_ bonus threshold (`requiredCount = mode.upperBonusThreshold / 21`: 3 for Normal, 4 for Family, 9 for Giant), the same number the delta-display cells already compute. Because that number is mode-dependent and only knowable at render time, the tooltip doesn't use a stored `exampleDice` for these categories at all — it synthesizes the _entire_ example live from `(mode, category.params.face)`: `requiredCount` dice showing `params.face`, padded with filler to `mode.diceCount`. Ones–Sixes store `exampleDice: null` for exactly this reason — there's nothing meaningful to store, so the column honestly reflects that instead of holding a placeholder value nothing reads. The tooltip also needs mode context for this to work even outside an active game, since it's shown during mode selection too, before any session/delta-display exists to fall back on.
 
 ---
 
 ## tRPC router shape
 
 **`catalog`** (read-only, rarely changes — long Query `staleTime`):
+
 - `listGameModes()`
 - `getGameMode(id)` → categories in order with label/description/example dice
 
 **`session`**:
+
 - `create({ gameModeId, playerNames[] })` → mutation → `{ code, hostToken }`
 - `get({ code })` → query, full current state (initial load / reconnect)
 - `onUpdate({ code })` → **subscription**, emits full session state on every change
-- `previewScores({ code, diceCounts })` → query, computes what every category in the session *would* score for a given dice tally, without submitting — powers the live score preview in the entry modal.
+- `previewScores({ code, diceCounts })` → query, computes what every category in the session _would_ score for a given dice tally, without submitting — powers the live score preview in the entry modal.
 - `submitScore({ code, hostToken, playerId, categoryId, value, dice? })` → mutation, host-only. `dice` (added after the original plan) persists the exact dice submitted, in entry order; omitted for a Strike or a fixed-value (straight) category.
 - `addPlayer` / `removePlayer` / `renamePlayer` → mutation, host-only
 - `endGame({ code, hostToken })` → mutation, host-only, stamps `sessions.finishedAt`.
@@ -261,6 +306,7 @@ Routes: `/` (create game, plus "continue" and history lists), `/s/:code/game` (h
 9. ✅ PWA manifest/service worker (`vite-plugin-pwa`, iOS home-screen meta tags, manifest icon path fix). Dockerfile + docker-compose + CI build/push/deploy for self-hosting.
 
 Also built, beyond the original build order:
+
 - ✅ Multi-device host access (`host_tokens` table, `claimHost`) and "continue where you left off" / game history on the create-game screen.
 - ✅ End-of-game celebration (Standings card + confetti) and game history — these were listed as backlog/"not building now" in the original plan and have since been built; see Product/UX decisions.
 - ✅ Dice persisted per score submission (in entry order) and shown back on the score table / when reopening a cell — the original plan assumed dice were never persisted (see Open items below); that assumption changed.

@@ -1,19 +1,19 @@
 {
-  "name": "yatzy",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently -n server,web -c green,blue \"pnpm --filter server dev\" \"pnpm --filter web dev\""
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "devDependencies": {
-    "@biomejs/biome": "2.6.6",
-    "concurrently": "10.0.7"
-  },
-  "packageManager": "pnpm@12.18.0"
+	"name": "yatzy",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "concurrently -n server,web -c green,blue \"pnpm --filter server dev\" \"pnpm --filter web dev\"",
+		"lint": "biome check"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"devDependencies": {
+		"@biomejs/biome": "2.6.6",
+		"concurrently": "10.0.7"
+	},
+	"packageManager": "pnpm@12.18.0"
 }

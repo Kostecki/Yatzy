@@ -63,7 +63,8 @@ export function diceFaceFrequency(sessions: StatsSession[]): {
 		for (const score of session.scores) {
 			if (!score.dice) continue;
 			allDice.push(score.dice);
-			(diceByGameMode[session.gameModeId] ??= []).push(score.dice);
+			diceByGameMode[session.gameModeId] ??= [];
+			diceByGameMode[session.gameModeId].push(score.dice);
 		}
 	}
 
@@ -279,12 +280,14 @@ export function bonusAchievementRate(
 			total: overallTotal,
 			rate: overallTotal > 0 ? overallAchieved / overallTotal : 0,
 		},
-		...Array.from(byGameMode.entries()).map(([gameModeId, { achieved, total }]) => ({
-			gameModeId,
-			achieved,
-			total,
-			rate: total > 0 ? achieved / total : 0,
-		})),
+		...Array.from(byGameMode.entries()).map(
+			([gameModeId, { achieved, total }]) => ({
+				gameModeId,
+				achieved,
+				total,
+				rate: total > 0 ? achieved / total : 0,
+			}),
+		),
 	];
 }
 
@@ -421,10 +424,9 @@ export function categoryAveragesByPlayer(
 		Array.from(sums.entries()).map(([name, categoryMap]) => [
 			name,
 			Object.fromEntries(
-				Array.from(categoryMap.entries()).map(([categoryId, { sum, count }]) => [
-					categoryId,
-					sum / count,
-				]),
+				Array.from(categoryMap.entries()).map(
+					([categoryId, { sum, count }]) => [categoryId, sum / count],
+				),
 			),
 		]),
 	);
@@ -482,8 +484,10 @@ export function overview(sessions: StatsSession[]): Overview {
 			durations.length > 0
 				? durations.reduce((sum, ms) => sum + ms, 0) / durations.length
 				: undefined,
-		longestDurationMs: durations.length > 0 ? Math.max(...durations) : undefined,
-		shortestDurationMs: durations.length > 0 ? Math.min(...durations) : undefined,
+		longestDurationMs:
+			durations.length > 0 ? Math.max(...durations) : undefined,
+		shortestDurationMs:
+			durations.length > 0 ? Math.min(...durations) : undefined,
 		totalDurationMs:
 			durations.length > 0
 				? durations.reduce((sum, ms) => sum + ms, 0)

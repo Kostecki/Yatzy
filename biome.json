@@ -1,12 +1,13 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!**/drizzle/meta", "!**/public/favicon"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -41,16 +42,9 @@
 					"level": "on",
 					"options": {
 						"groups": [
-							[
-								":NODE:",
-								":PACKAGE:",
-								":PACKAGE_WITH_PROTOCOL:"
-							],
+							[":NODE:", ":PACKAGE:", ":PACKAGE_WITH_PROTOCOL:"],
 							":BLANK_LINE:",
-							[
-								"./**",
-								"../**"
-							]
+							["./**", "../**"]
 						]
 					}
 				}
