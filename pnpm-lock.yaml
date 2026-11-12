@@ -182,8 +182,8 @@ importers:
         specifier: 11.3.7
         version: 11.3.7
       '@trpc/server':
-        specifier: 11.25.0
-        version: 11.25.0(fastify@5.12.8)(typescript@7.0.2)
+        specifier: 11.25.2
+        version: 11.25.2(fastify@5.12.8)(typescript@7.0.2)
       better-sqlite3:
         specifier: 13.0.3
         version: 13.0.3
@@ -240,8 +240,8 @@ importers:
         specifier: 9.7.5
         version: 9.7.5(react@19.3.1)
       '@tabler/icons-react':
-        specifier: 3.50.0
-        version: 3.50.0(react@19.3.1)
+        specifier: 3.51.0
+        version: 3.51.0(react@19.3.1)
       '@tanstack/react-query':
         specifier: 5.107.1
         version: 5.107.1(@types/react@19.3.0)(react@19.3.1)
@@ -249,11 +249,11 @@ importers:
         specifier: 1.170.46
         version: 1.170.46(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@trpc/client':
-        specifier: 11.25.0
-        version: 11.25.0(@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
+        specifier: 11.25.2
+        version: 11.25.2(@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
       '@trpc/react-query':
-        specifier: 11.25.0
-        version: 11.25.0(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.25.0(@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)
+        specifier: 11.25.2
+        version: 11.25.2(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.25.2(@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)
       canvas-confetti:
         specifier: 1.9.4
         version: 1.9.4
@@ -280,8 +280,8 @@ importers:
         version: link:../server
     devDependencies:
       '@trpc/server':
-        specifier: 11.25.0
-        version: 11.25.0(fastify@5.12.8)(typescript@7.0.2)
+        specifier: 11.25.2
+        version: 11.25.2(fastify@5.12.8)(typescript@7.0.2)
       '@types/canvas-confetti':
         specifier: 1.9.0
         version: 1.9.0
@@ -1773,13 +1773,13 @@ packages:
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
-  '@tabler/icons-react@3.50.0':
-    resolution: {integrity: sha512-X9XhFbxAmSNimQ71VAd7opfd4z84x1pLrEbBT33VCIEsFs8zWVqdhh5r/Jyi/3iJjQ861kE5Wm9ixiJfS2nwBA==}
+  '@tabler/icons-react@3.51.0':
+    resolution: {integrity: sha512-F3GGChIUspsCq+HhXtJezc1W9QRcRlEG07Jb4dKUR1TV+mq1uvY7+G46n1fZE02jhQUOVuOoi445Bk1O9mFrDg==}
     peerDependencies:
       react: '>= 16'
 
-  '@tabler/icons@3.50.0':
-    resolution: {integrity: sha512-HflLxyrH1cqC7s7jzQGSjpsTAVIoaf7+/yHjbdM59rJQBMjliibp+LYhDPFxOMcwa1M8DNpOk6ENzQiWn9a1Dg==}
+  '@tabler/icons@3.51.0':
+    resolution: {integrity: sha512-0pinvPZz7YeX+OSfxuEAbnEPWbocVXW5iU8h5lh41pYG8sZuQfpWECC980lxOT0clGIcNGn8xsBr+zKaRGdA/g==}
 
   '@tanstack/history@1.162.5':
     resolution: {integrity: sha512-w1+YvwmTkwt5n8yUqEH3IWZ9DsmorCZW/EQ3KYHnqEgIkOZpH54NvW6/Epq3Dzb8H0ifIeYX8PExvrNLIH5FIA==}
@@ -1821,23 +1821,23 @@ packages:
     resolution: {integrity: sha512-/67zpWDBLV+oYAEL682s1ktXL0HgqX76f6gaVGkGnVZlBbm1zd0v4Bz8MFF2GGhoX9rvfq3KSQHubFHwa6w6/Q==}
     engines: {node: '>=12'}
 
-  '@trpc/client@11.25.0':
-    resolution: {integrity: sha512-sDLNepXpsR+b1KnnZ/9J3wIMaRaqE//PGzAAaUVM2Mpv9/POU4NCI5WDyu1LSBhLNuDycTHgGEE3tfClPEsiBA==}
+  '@trpc/client@11.25.2':
+    resolution: {integrity: sha512-x601Z/ZURzf+wMVk5LX3j/ujh/SrUy6D/ygN/YDq1WfQ2csSVTduMLLNnF0OD0FyszffUM5PoUnoabH3ZbLHJQ==}
     peerDependencies:
-      '@trpc/server': 11.25.0
+      '@trpc/server': 11.25.2
       typescript: '>=5.7.2'
 
-  '@trpc/react-query@11.25.0':
-    resolution: {integrity: sha512-VYlT3+K3NJ8vjfxXbaZGANaD4ZH6dLIFYi2ASVMcWmsAY2OxUEXyYMwnUyivXY98g9yUidk6D6iScWlkZq4sAg==}
+  '@trpc/react-query@11.25.2':
+    resolution: {integrity: sha512-XzYVrmPlJblEiO0YYoUrSy02IqjzD+C1vLThu5GW2EKIlvKcNuepI550zCagNN/fexsWrqdSC7jnzHfoEiJo2g==}
     peerDependencies:
       '@tanstack/react-query': ^5.80.3
-      '@trpc/client': 11.25.0
-      '@trpc/server': 11.25.0
+      '@trpc/client': 11.25.2
+      '@trpc/server': 11.25.2
       react: '>=18.2.0'
       typescript: '>=5.7.2'
 
-  '@trpc/server@11.25.0':
-    resolution: {integrity: sha512-WnUlGgLdaRoOKbLKn/t3+6cnjPJndNKvJZYJ7RXSZwFOa1dam6Z8atf551KE0vz2vhyxRtcnk+58P7M/ztAjNw==}
+  '@trpc/server@11.25.2':
+    resolution: {integrity: sha512-zfFwyroSYSYlsAGo7yezGM+gAhHRBD9LyVMkXyCjWM2JuhorKGzl2fBzEUjHSKTtYlJ8l6DR3LHsBHBCTmAofQ==}
     peerDependencies:
       '@types/aws-lambda': '*'
       '@types/express': '*'
@@ -5175,12 +5175,12 @@ snapshots:
 
   '@standard-schema/utils@0.3.0': {}
 
-  '@tabler/icons-react@3.50.0(react@19.3.1)':
+  '@tabler/icons-react@3.51.0(react@19.3.1)':
     dependencies:
-      '@tabler/icons': 3.50.0
+      '@tabler/icons': 3.51.0
       react: 19.3.1
 
-  '@tabler/icons@3.50.0': {}
+  '@tabler/icons@3.51.0': {}
 
   '@tanstack/history@1.162.5': {}
 
@@ -5225,20 +5225,20 @@ snapshots:
       magic-string: 0.30.21
       string.prototype.matchall: 4.0.12
 
-  '@trpc/client@11.25.0(@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)':
+  '@trpc/client@11.25.2(@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)':
     dependencies:
-      '@trpc/server': 11.25.0(fastify@5.12.8)(typescript@7.0.2)
+      '@trpc/server': 11.25.2(fastify@5.12.8)(typescript@7.0.2)
       typescript: 7.0.2
 
-  '@trpc/react-query@11.25.0(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.25.0(@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)':
+  '@trpc/react-query@11.25.2(@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.25.2(@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)':
     dependencies:
       '@tanstack/react-query': 5.107.1(@types/react@19.3.0)(react@19.3.1)
-      '@trpc/client': 11.25.0(@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
-      '@trpc/server': 11.25.0(fastify@5.12.8)(typescript@7.0.2)
+      '@trpc/client': 11.25.2(@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
+      '@trpc/server': 11.25.2(fastify@5.12.8)(typescript@7.0.2)
       react: 19.3.1
       typescript: 7.0.2
 
-  '@trpc/server@11.25.0(fastify@5.12.8)(typescript@7.0.2)':
+  '@trpc/server@11.25.2(fastify@5.12.8)(typescript@7.0.2)':
     dependencies:
       typescript: 7.0.2
     optionalDependencies:
