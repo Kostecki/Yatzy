@@ -191,8 +191,8 @@ importers:
         specifier: 11.3.7
         version: 11.3.7
       '@trpc/server':
-        specifier: 11.29.5
-        version: 11.29.5(fastify@5.12.8)(typescript@7.0.2)
+        specifier: 11.29.7
+        version: 11.29.7(fastify@5.12.8)(typescript@7.0.2)
       better-sqlite3:
         specifier: 13.2.0
         version: 13.2.0
@@ -258,17 +258,17 @@ importers:
         specifier: 1.170.46
         version: 1.170.46(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@trpc/client':
-        specifier: 11.29.5
-        version: 11.29.5(@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
+        specifier: 11.29.7
+        version: 11.29.7(@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
       '@trpc/react-query':
-        specifier: 11.29.5
-        version: 11.29.5(@tanstack/react-query@5.108.2(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.29.5(@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)
+        specifier: 11.29.7
+        version: 11.29.7(@tanstack/react-query@5.108.2(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.29.7(@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)
       canvas-confetti:
         specifier: 1.9.4
         version: 1.9.4
       i18next:
-        specifier: 27.2.2
-        version: 27.2.2(typescript@7.0.2)
+        specifier: 27.2.3
+        version: 27.2.3(typescript@7.0.2)
       react:
         specifier: 19.3.1
         version: 19.3.1
@@ -277,7 +277,7 @@ importers:
         version: 19.3.1(react@19.3.1)
       react-i18next:
         specifier: 18.0.3
-        version: 18.0.3(@types/react@19.3.0)(i18next@27.2.2(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)
+        version: 18.0.3(@types/react@19.3.0)(i18next@27.2.3(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)
       react-qr-code:
         specifier: 2.2.0
         version: 2.2.0(react@19.3.1)
@@ -289,8 +289,8 @@ importers:
         version: link:../server
     devDependencies:
       '@trpc/server':
-        specifier: 11.29.5
-        version: 11.29.5(fastify@5.12.8)(typescript@7.0.2)
+        specifier: 11.29.7
+        version: 11.29.7(fastify@5.12.8)(typescript@7.0.2)
       '@types/canvas-confetti':
         specifier: 1.9.0
         version: 1.9.0
@@ -1851,24 +1851,24 @@ packages:
     resolution: {integrity: sha512-/67zpWDBLV+oYAEL682s1ktXL0HgqX76f6gaVGkGnVZlBbm1zd0v4Bz8MFF2GGhoX9rvfq3KSQHubFHwa6w6/Q==}
     engines: {node: '>=12'}
 
-  '@trpc/client@11.29.5':
-    resolution: {integrity: sha512-EGebaRjt/rDHt7gJ6nv262nLRPalzwSyI/dEMYtA+PBEy/HxhoVUW3bQqyE34cozJNj2HAgB+TqXVe76pWGk+Q==}
+  '@trpc/client@11.29.7':
+    resolution: {integrity: sha512-cW/8uDPDBEzSBdEoV0fLb6JL5U/YTOZRktLI7/bJJVsb9dz+qhYJST6YJEaI8yM6oz4MfnpCKf7Sk609zvjNxA==}
     peerDependencies:
-      '@trpc/server': 11.29.5
+      '@trpc/server': 11.29.7
       typescript: '>=5.7.2'
 
-  '@trpc/react-query@11.29.5':
-    resolution: {integrity: sha512-sDwivI7wTYxZA/+1Z1UtaP8K3OBXiV9a4Nz2eo5YSUXGHc4a3p1HT748D6E1vfH9Q/wZQb4IfnR3tBpm3PBx/g==}
+  '@trpc/react-query@11.29.7':
+    resolution: {integrity: sha512-PJTOKkfZhUesn0jYIiSC5wAu/Fix+acGQsgDwvPgqaA/3jb9LPySVJ8BiMAN3F3ZJ2tiyaX9Mycp8iLi4NZsUw==}
     deprecated: '@trpc/react-query only gets bug fixes and will be removed in the next major version of tRPC. Use @trpc/tanstack-react-query instead: https://trpc.io/docs/client/tanstack-react-query/migrating'
     peerDependencies:
       '@tanstack/react-query': ^5.80.3
-      '@trpc/client': 11.29.5
-      '@trpc/server': 11.29.5
+      '@trpc/client': 11.29.7
+      '@trpc/server': 11.29.7
       react: '>=18.2.0'
       typescript: '>=5.7.2'
 
-  '@trpc/server@11.29.5':
-    resolution: {integrity: sha512-8ET3fqBo4byVkjLNU047NFwmT3JQIjZCVpdJwanb6Tpv7b5P3M9pjN7JofqGyDQZaDR5XLkWX2hWrsIpjtt5wA==}
+  '@trpc/server@11.29.7':
+    resolution: {integrity: sha512-9chUuB0abOfVkCm87lFQ3PTUJzPlErlf5HOBzvwtiGl7B0YdPBul1O597NTzjUcF1XDTsRqdnQfrz7BeptzSXQ==}
     peerDependencies:
       '@types/aws-lambda': '*'
       '@types/express': '*'
@@ -2753,8 +2753,8 @@ packages:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
     engines: {node: '>= 0.8'}
 
-  i18next@27.2.2:
-    resolution: {integrity: sha512-1/AJgz/bpE/YL6tqekQlZAzDhkmrUBbgU8+Xon/Lwv6c5WdYuyFZ9mb86OVfR2C2XujUDT7Rz23Ydaq4l981lA==}
+  i18next@27.2.3:
+    resolution: {integrity: sha512-14wcQLAu5Aykwk4scBGl8tosKYth4S2PQDcusbES/bUsQ7X7DbcPygMzCe298U/NcAvDpqr+CX6oygbQoyLBRA==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -5294,20 +5294,20 @@ snapshots:
       magic-string: 0.30.21
       string.prototype.matchall: 4.0.12
 
-  '@trpc/client@11.29.5(@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)':
+  '@trpc/client@11.29.7(@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)':
     dependencies:
-      '@trpc/server': 11.29.5(fastify@5.12.8)(typescript@7.0.2)
+      '@trpc/server': 11.29.7(fastify@5.12.8)(typescript@7.0.2)
       typescript: 7.0.2
 
-  '@trpc/react-query@11.29.5(@tanstack/react-query@5.108.2(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.29.5(@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)':
+  '@trpc/react-query@11.29.7(@tanstack/react-query@5.108.2(@types/react@19.3.0)(react@19.3.1))(@trpc/client@11.29.7(@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2))(@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2)':
     dependencies:
       '@tanstack/react-query': 5.108.2(@types/react@19.3.0)(react@19.3.1)
-      '@trpc/client': 11.29.5(@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
-      '@trpc/server': 11.29.5(fastify@5.12.8)(typescript@7.0.2)
+      '@trpc/client': 11.29.7(@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2))(typescript@7.0.2)
+      '@trpc/server': 11.29.7(fastify@5.12.8)(typescript@7.0.2)
       react: 19.3.1
       typescript: 7.0.2
 
-  '@trpc/server@11.29.5(fastify@5.12.8)(typescript@7.0.2)':
+  '@trpc/server@11.29.7(fastify@5.12.8)(typescript@7.0.2)':
     dependencies:
       typescript: 7.0.2
     optionalDependencies:
@@ -6140,7 +6140,7 @@ snapshots:
       statuses: 2.0.2
       toidentifier: 1.0.1
 
-  i18next@27.2.2(typescript@7.0.2):
+  i18next@27.2.3(typescript@7.0.2):
     optionalDependencies:
       typescript: 7.0.2
 
@@ -6537,10 +6537,10 @@ snapshots:
       react: 19.3.1
       scheduler: 0.28.0
 
-  react-i18next@18.0.3(@types/react@19.3.0)(i18next@27.2.2(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2):
+  react-i18next@18.0.3(@types/react@19.3.0)(i18next@27.2.3(typescript@7.0.2))(react@19.3.1)(typescript@7.0.2):
     dependencies:
       html-parse-stringify: 4.0.1
-      i18next: 27.2.2(typescript@7.0.2)
+      i18next: 27.2.3(typescript@7.0.2)
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
