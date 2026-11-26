@@ -15,5 +15,5 @@
 		"@biomejs/biome": "2.6.8",
 		"concurrently": "10.0.7"
 	},
-	"packageManager": "pnpm@12.22.0"
+	"packageManager": "pnpm@12.23.0"
 }
